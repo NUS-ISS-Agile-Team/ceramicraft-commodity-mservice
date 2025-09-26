@@ -16,4 +16,4 @@ mysql:
   host: "mysql-container" # mysql-container 127.0.0.1
   port: "3306"
   userName: "root"
-  dbName: "commodity_db"
+  dbName: "product_db"
