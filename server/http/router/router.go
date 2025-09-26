@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/http/api"
 	_ "github.com/NUS-ISS-Agile-Team/ceramicraft-user-mservice/server/docs"
 	swaggerFiles "github.com/swaggo/files"
 	gs "github.com/swaggo/gin-swagger"
@@ -21,6 +22,7 @@ func NewRouter() *gin.Engine {
 				"message": "pong",
 			})
 		})
+		v1.POST("/add", api.AddProduct)
 	}
 	return r
 }

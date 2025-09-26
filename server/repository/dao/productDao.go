@@ -11,7 +11,7 @@ import (
 )
 
 type ProductDao interface {
-	CreateProduct(ctx context.Context, product *model.Product) (int, error)
+	CreateProduct(ctx context.Context, product *model.Product) (productId int, err error)
 	UpdateProduct(ctx context.Context, product *model.Product, tx *gorm.DB) error
 	GetProductByID(ctx context.Context, id int) (*model.Product, error)
 }
