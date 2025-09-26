@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Product struct {
 	gorm.Model
-	ProductId int64  `gorm:"uniqueIndex;not null"`
+
 	Name      string `gorm:"not null"`
 	Price     int64  `gorm:"not null"`
 	Desc      string `gorm:"type:text"`
