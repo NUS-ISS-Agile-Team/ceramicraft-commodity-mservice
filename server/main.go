@@ -6,6 +6,8 @@ import (
 	"syscall"
 
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/config"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/grpc"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/http"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/log"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/repository"
 )

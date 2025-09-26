@@ -13,8 +13,8 @@ import (
 )
 
 func Init(exitSig chan os.Signal) {
-	ipPort := fmt.Sprintf("%s:%d", config.Config.GrpcConfig.Host, config.Config.GrpcConfig.Port)
-	listener, err := net.Listen("tcp", ipPort)
+	address := fmt.Sprintf("%s:%d", config.Config.GrpcConfig.Host, config.Config.GrpcConfig.Port)
+	listener, err := net.Listen("tcp", address)
 	if err != nil {
 		log.Logger.Fatalf("Failed to listen: %v", err)
 		exitSig <- os.Interrupt
@@ -28,9 +28,9 @@ func Init(exitSig chan os.Signal) {
 		grpc.MaxSendMsgSize(1024 * 1024), // Set maximum send message size (1MB here)
 	}
 	grpcServer := grpc.NewServer(opts...)
-	userpb.RegisterUserServiceServer(grpcServer, &UserService{})
+	productpb.RegisterProductServiceServer(grpcServer, &ProductService{})
 
-	log.Logger.Infof("Server is running on %s", ipPort)
+	log.Logger.Infof("Product RPC Server is running on %s", address)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Logger.Fatal("Failed to serve: %v", err)
 		exitSig <- os.Interrupt
