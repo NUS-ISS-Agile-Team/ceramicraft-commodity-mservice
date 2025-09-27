@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/log"
@@ -14,6 +15,7 @@ type ProductDao interface {
 	CreateProduct(ctx context.Context, product *model.Product) (productId int, err error)
 	UpdateProduct(ctx context.Context, product *model.Product, tx *gorm.DB) error
 	GetProductByID(ctx context.Context, id int) (*model.Product, error)
+	UpdateProductStatus(ctx context.Context, id int, status int) error
 }
 
 type ProductDaoImpl struct {
@@ -63,4 +65,19 @@ func (p *ProductDaoImpl) GetProductByID(ctx context.Context, id int) (*model.Pro
 		return nil, result.Error
 	}
 	return &product, nil
+}
+
+// UpdateProductStatus 更新商品状态
+func (p *ProductDaoImpl) UpdateProductStatus(ctx context.Context, id int, status int) error {
+	result := p.db.WithContext(ctx).Model(&model.Product{}).Where("id = ?", id).Update("status", status)
+	if result.Error != nil {
+		log.Logger.Errorf("Failed to update product status, ID: %d, status: %d, error: %v", id, status, result.Error)
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		err := fmt.Errorf("product not found with ID: %d", id)
+		log.Logger.Error(err)
+		return err
+	}
+	return nil
 }

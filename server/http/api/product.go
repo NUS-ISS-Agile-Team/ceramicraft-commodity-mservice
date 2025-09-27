@@ -18,8 +18,8 @@ import (
 // @Accept json
 // @Produce json
 // @Param product body types.ProductInfo true "商品信息"
-// @Success 200 {object} gin.H
-// @Failure 400 {object} gin.H
+// @Success 200 {object} data.BaseResponse
+// @Failure 400 {object} data.BaseResponse
 // @Router /add [post]
 func AddProduct(c *gin.Context) {
 	var req types.ProductInfo
@@ -75,4 +75,64 @@ func GetProduct(c *gin.Context) {
 
 	// 返回商品信息
 	c.JSON(http.StatusOK, data.ResponseSuccess(product))
+}
+
+// PublishProduct godoc
+// @Summary 上架商品
+// @Description 将商品状态更改为上架状态
+// @Tags 商品
+// @Accept json
+// @Produce json
+// @Param request body types.UpdateProductStatusRequest true "商品上架请求"
+// @Success 200 {object} data.BaseResponse "上架成功"
+// @Failure 400 {object} data.BaseResponse "请求参数错误"
+// @Failure 404 {object} data.BaseResponse "商品不存在"
+// @Failure 500 {object} data.BaseResponse "服务器内部错误"
+// @Router /publish [post]
+func PublishProduct(c *gin.Context) {
+	var req types.UpdateProductStatusRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Logger.Errorf("PublishProduct: Invalid request body: %v", err)
+		c.JSON(http.StatusBadRequest, data.ResponseFailed(err.Error()))
+		return
+	}
+
+	err := service.GetProductServiceInstance().PublishProduct(c.Request.Context(), req.ID)
+	if err != nil {
+		log.Logger.Errorf("PublishProduct: Failed to publish product: %v", err)
+		c.JSON(http.StatusOK, data.ResponseFailed(err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, data.ResponseSuccess(nil))
+}
+
+// UnpublishProduct godoc
+// @Summary 下架商品
+// @Description 将商品状态更改为下架状态
+// @Tags 商品
+// @Accept json
+// @Produce json
+// @Param request body types.UpdateProductStatusRequest true "商品下架请求"
+// @Success 200 {object} data.BaseResponse "下架成功"
+// @Failure 400 {object} data.BaseResponse "请求参数错误"
+// @Failure 404 {object} data.BaseResponse "商品不存在"
+// @Failure 500 {object} data.BaseResponse "服务器内部错误"
+// @Router /unpublish [post]
+func UnpublishProduct(c *gin.Context) {
+	var req types.UpdateProductStatusRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Logger.Errorf("UnpublishProduct: Invalid request body: %v", err)
+		c.JSON(http.StatusBadRequest, data.ResponseFailed(err.Error()))
+		return
+	}
+
+	err := service.GetProductServiceInstance().UnpublishProduct(c.Request.Context(), req.ID)
+	if err != nil {
+		log.Logger.Errorf("UnpublishProduct: Failed to unpublish product: %v", err)
+		c.JSON(http.StatusOK, data.ResponseFailed(err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, data.ResponseSuccess(nil))
 }

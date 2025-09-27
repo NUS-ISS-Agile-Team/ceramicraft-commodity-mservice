@@ -14,3 +14,7 @@ type ProductInfo struct {
 	CareInstructions string `json:"care_instructions"`
 	Status           int32  `json:"status"` // 0: 未上架, 1: 已上架
 }
+
+type UpdateProductStatusRequest struct {
+	ID     int `json:"id"`
+}
