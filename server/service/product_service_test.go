@@ -213,6 +213,6 @@ func TestProductServiceImpl_UnpublishProduct(t *testing.T) {
 
 	err = testProductServiceImpl.UnpublishProduct(context.Background(), 2)
 	if err == nil {
-		t.Errorf("Expected error when publishing an already published product, got nil")
+		t.Errorf("Expected error when unpublishing an already unpublished product, got nil")
 	}
 }
