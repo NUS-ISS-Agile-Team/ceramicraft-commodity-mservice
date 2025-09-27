@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"reflect"
 	"testing"
 
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/repository/dao/mocks"
@@ -57,5 +58,55 @@ func TestProductServiceImpl_Create(t *testing.T) {
 	_, err := testProductServiceImpl.Create(context.Background(), productInfo)
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
+	}
+}
+
+func TestProductServiceImpl_GetProductByID(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	m := mocks.NewMockProductDao(ctrl)
+
+	m.EXPECT().GetProductByID(context.Background(), 1).Return(&model.Product{
+		Name:             "Test Product",
+		Price:            200,
+		Desc:             "This is a test product",
+		Stock:            50,
+		PicInfo:          "http://example.com/pic.jpg",
+		Status:           0,
+		Category:         "Test Category",
+		Weight:           "1kg",
+		Material:         "Plastic",
+		Capacity:         "500ml",
+		Dimensions:       "10x10x10cm",
+		CareInstructions: "Handle with care",
+	}, nil)
+
+	testProductServiceImpl := &ProductServiceImpl{
+		productDao: m,
+	}
+
+	productInfo, err := testProductServiceImpl.GetProductByID(context.Background(), 1)
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+
+	expectedProductInfo := &types.ProductInfo{
+		Name:             "Test Product",
+		Price:            200,
+		Desc:             "This is a test product",
+		Stock:            50,
+		PicInfo:          "http://example.com/pic.jpg",
+		Status:           0,
+		Category:         "Test Category",
+		Weight:           "1kg",
+		Material:         "Plastic",
+		Capacity:         "500ml",
+		Dimensions:       "10x10x10cm",
+		CareInstructions: "Handle with care",
+	}
+
+	if !reflect.DeepEqual(productInfo, expectedProductInfo) {
+		t.Errorf("Product info mismatch:\ngot: %+v\nwant: %+v", productInfo, expectedProductInfo)
 	}
 }

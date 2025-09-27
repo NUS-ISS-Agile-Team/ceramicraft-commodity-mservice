@@ -23,6 +23,7 @@ func NewRouter() *gin.Engine {
 			})
 		})
 		v1.POST("/add", api.AddProduct)
+		v1.GET("/product/:id", api.GetProduct)
 	}
 	return r
 }
