@@ -11,6 +11,7 @@ import (
 
 type ProductService interface {
 	Create(ctx context.Context, product *types.ProductInfo) (productId int, err error)
+	GetProductByID(ctx context.Context, id int) (productInfo *types.ProductInfo, err error)
 }
 
 type ProductServiceImpl struct {
@@ -43,4 +44,30 @@ func (p *ProductServiceImpl) Create(ctx context.Context, product *types.ProductI
 		return -1, err
 	}
 	return id, nil
+}
+
+// GetProductByID 根据ID获取产品信息 (商家侧，无论是否上架都可以看到)
+func (p *ProductServiceImpl) GetProductByID(ctx context.Context, id int) (productInfo *types.ProductInfo, err error) {
+	product, err := p.productDao.GetProductByID(ctx, id)
+	if err != nil {
+		log.Logger.Errorf("ProductService: Failed to get product by ID: %v", err)
+		return nil, err
+	}
+	if product == nil {
+		return nil, nil
+	}
+	return &types.ProductInfo{
+		Name:             product.Name,
+		Category:         product.Category,
+		Price:            product.Price,
+		Desc:             product.Desc,
+		Stock:            product.Stock,
+		PicInfo:          product.PicInfo,
+		Weight:           product.Weight,
+		Material:         product.Material,
+		Capacity:         product.Capacity,
+		Dimensions:       product.Dimensions,
+		CareInstructions: product.CareInstructions,
+		Status:           product.Status,
+	}, nil
 }
