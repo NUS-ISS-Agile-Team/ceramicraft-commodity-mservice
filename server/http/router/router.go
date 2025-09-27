@@ -24,6 +24,8 @@ func NewRouter() *gin.Engine {
 		})
 		v1.POST("/add", api.AddProduct)
 		v1.GET("/product/:id", api.GetProduct)
+		v1.POST("/publish", api.PublishProduct)
+		v1.POST("/unpublish", api.UnpublishProduct)
 	}
 	return r
 }

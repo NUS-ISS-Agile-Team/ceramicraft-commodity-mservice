@@ -110,3 +110,109 @@ func TestProductServiceImpl_GetProductByID(t *testing.T) {
 		t.Errorf("Product info mismatch:\ngot: %+v\nwant: %+v", productInfo, expectedProductInfo)
 	}
 }
+
+func TestProductServiceImpl_PublishProduct(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	m := mocks.NewMockProductDao(ctrl)
+
+	m.EXPECT().GetProductByID(context.Background(), 1).Return(&model.Product{
+		Name:             "Test Product",
+		Price:            200,
+		Desc:             "This is a test product",
+		Stock:            50,
+		PicInfo:          "http://example.com/pic.jpg",
+		Status:           0,
+		Category:         "Test Category",
+		Weight:           "1kg",
+		Material:         "Plastic",
+		Capacity:         "500ml",
+		Dimensions:       "10x10x10cm",
+		CareInstructions: "Handle with care",
+	}, nil)
+
+	m.EXPECT().UpdateProductStatus(context.Background(), 1, 1).Return(nil)
+
+	testProductServiceImpl := &ProductServiceImpl{
+		productDao: m,
+	}
+
+	err := testProductServiceImpl.PublishProduct(context.Background(), 1)
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+
+	m.EXPECT().GetProductByID(context.Background(), 2).Return(&model.Product{
+		Name:             "Test Product",
+		Price:            200,
+		Desc:             "This is a test product",
+		Stock:            50,
+		PicInfo:          "http://example.com/pic.jpg",
+		Status:           1,
+		Category:         "Test Category",
+		Weight:           "1kg",
+		Material:         "Plastic",
+		Capacity:         "500ml",
+		Dimensions:       "10x10x10cm",
+		CareInstructions: "Handle with care",
+	}, nil)
+
+	err = testProductServiceImpl.PublishProduct(context.Background(), 2)
+	if err == nil {
+		t.Errorf("Expected error when publishing an already published product, got nil")
+	}
+}
+
+func TestProductServiceImpl_UnpublishProduct(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	m := mocks.NewMockProductDao(ctrl)
+
+	m.EXPECT().GetProductByID(context.Background(), 1).Return(&model.Product{
+		Name:             "Test Product",
+		Price:            200,
+		Desc:             "This is a test product",
+		Stock:            50,
+		PicInfo:          "http://example.com/pic.jpg",
+		Status:           1,
+		Category:         "Test Category",
+		Weight:           "1kg",
+		Material:         "Plastic",
+		Capacity:         "500ml",
+		Dimensions:       "10x10x10cm",
+		CareInstructions: "Handle with care",
+	}, nil)
+
+	m.EXPECT().UpdateProductStatus(context.Background(), 1, 0).Return(nil)
+
+	testProductServiceImpl := &ProductServiceImpl{
+		productDao: m,
+	}
+
+	err := testProductServiceImpl.UnpublishProduct(context.Background(), 1)
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+
+	m.EXPECT().GetProductByID(context.Background(), 2).Return(&model.Product{
+		Name:             "Test Product",
+		Price:            200,
+		Desc:             "This is a test product",
+		Stock:            50,
+		PicInfo:          "http://example.com/pic.jpg",
+		Status:           0,
+		Category:         "Test Category",
+		Weight:           "1kg",
+		Material:         "Plastic",
+		Capacity:         "500ml",
+		Dimensions:       "10x10x10cm",
+		CareInstructions: "Handle with care",
+	}, nil)
+
+	err = testProductServiceImpl.UnpublishProduct(context.Background(), 2)
+	if err == nil {
+		t.Errorf("Expected error when unpublishing an already unpublished product, got nil")
+	}
+}
