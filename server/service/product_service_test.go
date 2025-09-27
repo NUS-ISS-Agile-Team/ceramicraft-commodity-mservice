@@ -19,12 +19,18 @@ func TestProductServiceImpl_Create(t *testing.T) {
 	m := mocks.NewMockProductDao(ctrl)
 
 	productModel := &model.Product{
-		Name:    "Test Product",
-		Price:   200,
-		Desc:    "This is a test product",
-		Stock:   50,
-		PicInfo: "http://example.com/pic.jpg",
-		Status:  0,
+		Name:             "Test Product",
+		Price:            200,
+		Desc:             "This is a test product",
+		Stock:            50,
+		PicInfo:          "http://example.com/pic.jpg",
+		Status:           0,
+		Category:         "Test Category",
+		Weight:           "1kg",
+		Material:         "Plastic",
+		Capacity:         "500ml",
+		Dimensions:       "10x10x10cm",
+		CareInstructions: "Handle with care",
 	}
 
 	m.EXPECT().CreateProduct(context.Background(), gomock.Eq(productModel)).Return(1, nil)
@@ -34,16 +40,21 @@ func TestProductServiceImpl_Create(t *testing.T) {
 	}
 
 	productInfo := &types.ProductInfo{
-		Name:    "Test Product",
-		Price:   200,
-		Desc:    "This is a test product",
-		Stock:   50,
-		PicInfo: "http://example.com/pic.jpg",
-		Status:  0,
+		Name:             "Test Product",
+		Price:            200,
+		Desc:             "This is a test product",
+		Stock:            50,
+		PicInfo:          "http://example.com/pic.jpg",
+		Status:           0,
+		Category:         "Test Category",
+		Weight:           "1kg",
+		Material:         "Plastic",
+		Capacity:         "500ml",
+		Dimensions:       "10x10x10cm",
+		CareInstructions: "Handle with care",
 	}
 
-	err := testProductServiceImpl.Create(context.Background(), productInfo)
-
+	_, err := testProductServiceImpl.Create(context.Background(), productInfo)
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
