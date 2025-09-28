@@ -121,14 +121,14 @@ func TestProductServiceImpl_GetProductByID(t *testing.T) {
 
 	m.EXPECT().GetProductByID(context.Background(), 2).Return(nil, errors.New("product not found"))
 
-	productInfo, err = testProductServiceImpl.GetProductByID(context.Background(), 2)
+	_, err = testProductServiceImpl.GetProductByID(context.Background(), 2)
 	if err == nil {
 		t.Errorf("Expected error when getting a non-existent product, got nil")
 	}
 
 	m.EXPECT().GetProductByID(context.Background(), 3).Return(nil, nil)
 
-	productInfo, err = testProductServiceImpl.GetProductByID(context.Background(), 3)
+	productInfo, _ = testProductServiceImpl.GetProductByID(context.Background(), 3)
 	if productInfo != nil {
 		t.Errorf("Expected nil product info for non-existent product, got %+v", productInfo)
 	}
