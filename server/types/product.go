@@ -18,3 +18,8 @@ type ProductInfo struct {
 type UpdateProductStatusRequest struct {
 	ID     int `json:"id"`
 }
+
+type UpdateProductStockRequest struct {
+	ID    int   `json:"id"`
+	Stock int `json:"stock"`
+}

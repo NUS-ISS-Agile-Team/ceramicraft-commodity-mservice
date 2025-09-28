@@ -1,3 +1,4 @@
+basePath: /product-ms/v1
 definitions:
   data.BaseResponse:
     properties:
@@ -40,10 +41,21 @@ definitions:
       id:
         type: integer
     type: object
+  types.UpdateProductStockRequest:
+    properties:
+      id:
+        type: integer
+      stock:
+        type: integer
+    type: object
+host: localhost:8080
 info:
   contact: {}
+  description: 商品微服务相关接口
+  title: 商品服务 API
+  version: "1.0"
 paths:
-  /add:
+  /merchant/add:
     post:
       consumes:
       - application/json
@@ -69,7 +81,7 @@ paths:
       summary: 添加商品
       tags:
       - 商品
-  /product/{id}:
+  /merchant/product/{id}:
     get:
       consumes:
       - application/json
@@ -107,7 +119,7 @@ paths:
       summary: 获取商品详情
       tags:
       - 商品
-  /publish:
+  /merchant/publish:
     post:
       consumes:
       - application/json
@@ -141,7 +153,7 @@ paths:
       summary: 上架商品
       tags:
       - 商品
-  /unpublish:
+  /merchant/unpublish:
     post:
       consumes:
       - application/json
@@ -173,6 +185,32 @@ paths:
           schema:
             $ref: '#/definitions/data.BaseResponse'
       summary: 下架商品
+      tags:
+      - 商品
+  /merchant/updateStock:
+    post:
+      consumes:
+      - application/json
+      description: 只有当商品处于下架状态时，才能更改商品库存
+      parameters:
+      - description: 更新商品库存请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateProductStockRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 更新成功
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: 商家端更新商品库存
       tags:
       - 商品
 swagger: "2.0"

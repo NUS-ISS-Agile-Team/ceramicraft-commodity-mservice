@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/add": {
+        "/merchant/add": {
             "post": {
                 "description": "新增一个商品",
                 "consumes": [
@@ -55,7 +55,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/product/{id}": {
+        "/merchant/product/{id}": {
             "get": {
                 "description": "根据商品ID获取商品详细信息",
                 "consumes": [
@@ -117,7 +117,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/publish": {
+        "/merchant/publish": {
             "post": {
                 "description": "将商品状态更改为上架状态",
                 "consumes": [
@@ -169,7 +169,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/unpublish": {
+        "/merchant/unpublish": {
             "post": {
                 "description": "将商品状态更改为下架状态",
                 "consumes": [
@@ -214,6 +214,46 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/merchant/updateStock": {
+            "post": {
+                "description": "只有当商品处于下架状态时，才能更改商品库存",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商品"
+                ],
+                "summary": "商家端更新商品库存",
+                "parameters": [
+                    {
+                        "description": "更新商品库存请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateProductStockRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "更新成功",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
                         "schema": {
                             "$ref": "#/definitions/data.BaseResponse"
                         }
@@ -284,18 +324,29 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
+        },
+        "types.UpdateProductStockRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "stock": {
+                    "type": "integer"
+                }
+            }
         }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "1.0",
+	Host:             "localhost:8080",
+	BasePath:         "/product-ms/v1",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "商品服务 API",
+	Description:      "商品微服务相关接口",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
