@@ -21,6 +21,7 @@ jobs:
       - name: Run Tests with Coverage
         run: |
           cd server
+          go clean -testcache
           go test -coverprofile=coverage.out -coverpkg=./service ./...
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@1a6d90ebcb0e6a6b1d87e37ba693fe453195ae25
