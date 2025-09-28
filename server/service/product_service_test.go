@@ -308,3 +308,86 @@ func TestProductServiceImpl_UnpublishProduct(t *testing.T) {
 		t.Errorf("Expected database error, got nil")
 	}
 }
+
+func TestProductServiceImpl_UpdateProductStock(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	m := mocks.NewMockProductDao(ctrl)
+	testProductServiceImpl := &ProductServiceImpl{
+		productDao: m,
+	}
+
+	// 测试成功更新库存的情况
+	m.EXPECT().GetProductByID(context.Background(), 1).Return(&model.Product{
+		Name:   "Test Product",
+		Stock:  50,
+		Status: 0,
+	}, nil)
+	m.EXPECT().UpdateProductStock(context.Background(), 1, 60).Return(nil)
+
+	err := testProductServiceImpl.UpdateProductStock(context.Background(), 1, 60)
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+
+	// 测试产品不存在的情况
+	m.EXPECT().GetProductByID(context.Background(), 2).Return(nil, errors.New("product not found"))
+
+	err = testProductServiceImpl.UpdateProductStock(context.Background(), 2, 30)
+	if err == nil {
+		t.Errorf("Expected error for non-existent product, got nil")
+	}
+
+	// 测试产品为nil的情况
+	m.EXPECT().GetProductByID(context.Background(), 3).Return(nil, nil)
+
+	err = testProductServiceImpl.UpdateProductStock(context.Background(), 3, 30)
+	if err == nil {
+		t.Errorf("Expected error for nil product, got nil")
+	}
+
+	// 测试更新库存失败的情况
+	m.EXPECT().GetProductByID(context.Background(), 4).Return(&model.Product{
+		Name:   "Test Product",
+		Stock:  50,
+		Status: 0,
+	}, nil)
+	m.EXPECT().UpdateProductStock(context.Background(), 4, 70).Return(errors.New("database error"))
+
+	err = testProductServiceImpl.UpdateProductStock(context.Background(), 4, 70)
+	if err == nil {
+		t.Errorf("Expected database error, got nil")
+	}
+
+	// 测试更新负数库存的情况
+	err = testProductServiceImpl.UpdateProductStock(context.Background(), 5, -10)
+	if err == nil {
+		t.Errorf("Expected error for negative stock, got nil")
+	}
+
+	// 测试更新库存为零的情况
+	m.EXPECT().GetProductByID(context.Background(), 6).Return(&model.Product{
+		Name:   "Test Product",
+		Stock:  50,
+		Status: 0,
+	}, nil)
+	m.EXPECT().UpdateProductStock(context.Background(), 6, 0).Return(nil)
+
+	err = testProductServiceImpl.UpdateProductStock(context.Background(), 6, 0)
+	if err != nil {
+		t.Errorf("Expected no error for zero stock, got %v", err)
+	}
+
+	// 测试更新已上架商品库存的情况
+	m.EXPECT().GetProductByID(context.Background(), 7).Return(&model.Product{
+		Name:   "Test Product",
+		Stock:  50,
+		Status: 1,
+	}, nil)
+	
+	err = testProductServiceImpl.UpdateProductStock(context.Background(), 7, 60)
+	if err == nil {
+		t.Errorf("Expected error when updating stock for published product, got nil")
+	}
+}

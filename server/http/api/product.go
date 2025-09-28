@@ -20,7 +20,7 @@ import (
 // @Param product body types.ProductInfo true "商品信息"
 // @Success 200 {object} data.BaseResponse
 // @Failure 400 {object} data.BaseResponse
-// @Router /add [post]
+// @Router /merchant/add [post]
 func AddProduct(c *gin.Context) {
 	var req types.ProductInfo
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -48,7 +48,7 @@ func AddProduct(c *gin.Context) {
 // @Failure 400 {object} data.BaseResponse "请求参数错误"
 // @Failure 404 {object} data.BaseResponse "商品不存在"
 // @Failure 500 {object} data.BaseResponse "服务器内部错误"
-// @Router /product/{id} [get]
+// @Router /merchant/product/{id} [get]
 func GetProduct(c *gin.Context) {
 	// 解析路径参数
 	idStr := c.Param("id")
@@ -88,7 +88,7 @@ func GetProduct(c *gin.Context) {
 // @Failure 400 {object} data.BaseResponse "请求参数错误"
 // @Failure 404 {object} data.BaseResponse "商品不存在"
 // @Failure 500 {object} data.BaseResponse "服务器内部错误"
-// @Router /publish [post]
+// @Router /merchant/publish [post]
 func PublishProduct(c *gin.Context) {
 	var req types.UpdateProductStatusRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -118,7 +118,7 @@ func PublishProduct(c *gin.Context) {
 // @Failure 400 {object} data.BaseResponse "请求参数错误"
 // @Failure 404 {object} data.BaseResponse "商品不存在"
 // @Failure 500 {object} data.BaseResponse "服务器内部错误"
-// @Router /unpublish [post]
+// @Router /merchant/unpublish [post]
 func UnpublishProduct(c *gin.Context) {
 	var req types.UpdateProductStatusRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -136,3 +136,32 @@ func UnpublishProduct(c *gin.Context) {
 
 	c.JSON(http.StatusOK, data.ResponseSuccess(nil))
 }
+
+// UpdateProductStock godoc
+// @Summary 商家端更新商品库存
+// @Description 只有当商品处于下架状态时，才能更改商品库存
+// @Tags 商品
+// @Accept json
+// @Produce json
+// @Param request body types.UpdateProductStockRequest true "更新商品库存请求"
+// @Success 200 {object} data.BaseResponse "更新成功"
+// @Failure 400 {object} data.BaseResponse "请求参数错误"
+// @Router /merchant/updateStock [post]
+func UpdateProductStock(c *gin.Context) {
+	var req types.UpdateProductStockRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Logger.Errorf("UpdateProductStock: Invalid request body: %v", err)
+		c.JSON(http.StatusBadRequest, data.ResponseFailed(err.Error()))
+		return
+	}
+
+	err := service.GetProductServiceInstance().UpdateProductStock(c.Request.Context(), req.ID, req.Stock)
+	if err != nil {
+		log.Logger.Errorf("UpdateProductStock: Failed to update product stock: %v", err)
+		c.JSON(http.StatusOK, data.ResponseFailed(err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, data.ResponseSuccess(nil))
+}
+

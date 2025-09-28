@@ -14,6 +14,11 @@ import (
 
 var sigCh = make(chan os.Signal, 1)
 
+// @title       商品服务 API
+// @version     1.0
+// @description 商品微服务相关接口
+// @host        localhost:8080
+// @BasePath    /product-ms/v1
 func main() {
 	config.Init()
 	log.InitLogger()

@@ -93,3 +93,17 @@ func (mr *MockProductDaoMockRecorder) UpdateProductStatus(ctx, id, status interf
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProductStatus", reflect.TypeOf((*MockProductDao)(nil).UpdateProductStatus), ctx, id, status)
 }
+
+// UpdateProductStock mocks base method.
+func (m *MockProductDao) UpdateProductStock(ctx context.Context, id, stock int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateProductStock", ctx, id, stock)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateProductStock indicates an expected call of UpdateProductStock.
+func (mr *MockProductDaoMockRecorder) UpdateProductStock(ctx, id, stock interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProductStock", reflect.TypeOf((*MockProductDao)(nil).UpdateProductStock), ctx, id, stock)
+}

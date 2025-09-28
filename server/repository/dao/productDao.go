@@ -16,6 +16,7 @@ type ProductDao interface {
 	UpdateProduct(ctx context.Context, product *model.Product, tx *gorm.DB) error
 	GetProductByID(ctx context.Context, id int) (*model.Product, error)
 	UpdateProductStatus(ctx context.Context, id int, status int) error
+	UpdateProductStock(ctx context.Context, id int, stock int) error
 }
 
 type ProductDaoImpl struct {
@@ -65,6 +66,21 @@ func (p *ProductDaoImpl) GetProductByID(ctx context.Context, id int) (*model.Pro
 		return nil, result.Error
 	}
 	return &product, nil
+}
+
+// UpdateProductStock 更新商品库存
+func (p *ProductDaoImpl) UpdateProductStock(ctx context.Context, id int, stock int) error {
+	result := p.db.WithContext(ctx).Model(&model.Product{}).Where("id = ?", id).Update("stock", stock)
+	if result.Error != nil {
+		log.Logger.Errorf("Failed to update product stock, ID: %d, stock: %d, error: %v", id, stock, result.Error)
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		err := fmt.Errorf("product not found with ID: %d", id)
+		log.Logger.Error(err)
+		return err
+	}
+	return nil
 }
 
 // UpdateProductStatus 更新商品状态

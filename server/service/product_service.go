@@ -15,6 +15,9 @@ type ProductService interface {
 	GetProductByID(ctx context.Context, id int) (productInfo *types.ProductInfo, err error)
 	PublishProduct(ctx context.Context, id int) error
 	UnpublishProduct(ctx context.Context, id int) error
+
+	// 商家后台更新商品库存
+	UpdateProductStock(ctx context.Context, id int, newStock int) error
 }
 
 type ProductServiceImpl struct {
@@ -128,6 +131,42 @@ func (p *ProductServiceImpl) UnpublishProduct(ctx context.Context, id int) error
 	err = p.productDao.UpdateProductStatus(ctx, id, ProductStatusUnpublished)
 	if err != nil {
 		log.Logger.Errorf("UnpublishProduct: Failed to update product status: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+// UpdateProductStock 更新商品库存
+// 要求：
+// 1. 商品必须存在
+// 2. 商品必须处于下架状态
+// 3. 新的库存不能小于0
+func (p *ProductServiceImpl) UpdateProductStock(ctx context.Context, id int, newStock int) error {
+	// 检查库存是否合法
+	if newStock < 0 {
+		return fmt.Errorf("invalid stock value: %d, stock cannot be negative", newStock)
+	}
+
+	// 获取商品信息
+	product, err := p.productDao.GetProductByID(ctx, id)
+	if err != nil {
+		log.Logger.Errorf("UpdateProductStock: Failed to get product by ID: %v", err)
+		return err
+	}
+	if product == nil {
+		return fmt.Errorf("product not found with ID: %d", id)
+	}
+
+	// 检查商品状态
+	if product.Status != ProductStatusUnpublished {
+		return fmt.Errorf("cannot update stock for published product (ID: %d)", id)
+	}
+
+	// 更新库存
+	err = p.productDao.UpdateProductStock(ctx, id, newStock)
+	if err != nil {
+		log.Logger.Errorf("UpdateProductStock: Failed to update stock: %v", err)
 		return err
 	}
 

@@ -10,7 +10,7 @@ http:
 
 log:
   level: debug
-  file_path: ./logs/ceramicraft-user-mservice.log
+  file_path: ./logs/ceramicraft-commodity-mservice.log
 
 mysql:
   host: "mysql-container" # mysql-container 127.0.0.1
