@@ -8,6 +8,24 @@ definitions:
       err_msg:
         type: string
     type: object
+  data.ImgUploadRequest:
+    properties:
+      image_type:
+        enum:
+        - jpg
+        - png
+        - jpeg
+        type: string
+    required:
+    - image_type
+    type: object
+  data.ImgUploadResponse:
+    properties:
+      image_id:
+        type: string
+      upload_url:
+        type: string
+    type: object
   types.ProductInfo:
     properties:
       capacity:
@@ -48,7 +66,6 @@ definitions:
       stock:
         type: integer
     type: object
-host: localhost:8080
 info:
   contact: {}
   description: 商品微服务相关接口
@@ -81,6 +98,32 @@ paths:
       summary: 添加商品
       tags:
       - 商品
+  /merchant/images/upload-urls:
+    post:
+      consumes:
+      - application/json
+      description: Get presigned URL for image upload
+      parameters:
+      - description: image id=hex(md5(img)).(jpg|png)
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/data.ImgUploadRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/data.ImgUploadResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: Get presigned URL for image upload
+      tags:
+      - Image
   /merchant/product/{id}:
     get:
       consumes:

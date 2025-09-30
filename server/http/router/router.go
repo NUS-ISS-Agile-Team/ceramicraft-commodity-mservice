@@ -3,15 +3,14 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/http/api"
 	_ "github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/docs"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/http/api"
 	swaggerFiles "github.com/swaggo/files"
 	gs "github.com/swaggo/gin-swagger"
 )
 
 func NewRouter() *gin.Engine {
 	r := gin.Default()
-
 
 	v1 := r.Group("/product-ms/v1")
 	{
@@ -31,6 +30,7 @@ func NewRouter() *gin.Engine {
 			merchantRouter.POST("/publish", api.PublishProduct)
 			merchantRouter.POST("/unpublish", api.UnpublishProduct)
 			merchantRouter.POST("/updateStock", api.UpdateProductStock)
+			merchantRouter.POST("/images/upload-urls", api.GetImageUploadPresignURL)
 		}
 
 	}

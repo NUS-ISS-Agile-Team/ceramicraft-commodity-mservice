@@ -17,3 +17,7 @@ mysql:
   port: "3306"
   userName: "root"
   dbName: "product_db"
+
+s3Config:
+  bucket_name: "ceramicraft"
+  region: "ap-southeast-1"

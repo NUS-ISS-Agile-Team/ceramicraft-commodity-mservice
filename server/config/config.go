@@ -15,6 +15,7 @@ type Conf struct {
 	LogConfig   *LogConfig  `mapstructure:"log"`
 	HttpConfig  *HttpConfig `mapstructure:"http"`
 	MySQLConfig *MySQL      `mapstructure:"mysql"`
+	S3Config    *S3Config   `mapstructure:"s3Config"`
 }
 
 type HttpConfig struct {
@@ -40,6 +41,11 @@ type MySQL struct {
 	UserName string `mapstructure:"userName"`
 	Password string `mapstructure:"password"`
 	DBName   string `mapstructure:"dbName"`
+}
+
+type S3Config struct {
+	BucketName string `mapstructure:"bucket_name"`
+	Region     string `mapstructure:"region"`
 }
 
 func Init() {

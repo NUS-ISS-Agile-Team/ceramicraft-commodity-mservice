@@ -55,6 +55,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/merchant/images/upload-urls": {
+            "post": {
+                "description": "Get presigned URL for image upload",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Get presigned URL for image upload",
+                "parameters": [
+                    {
+                        "description": "image id=hex(md5(img)).(jpg|png)",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/data.ImgUploadRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/data.ImgUploadResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/merchant/product/{id}": {
             "get": {
                 "description": "根据商品ID获取商品详细信息",
@@ -275,6 +315,33 @@ const docTemplate = `{
                 }
             }
         },
+        "data.ImgUploadRequest": {
+            "type": "object",
+            "required": [
+                "image_type"
+            ],
+            "properties": {
+                "image_type": {
+                    "type": "string",
+                    "enum": [
+                        "jpg",
+                        "png",
+                        "jpeg"
+                    ]
+                }
+            }
+        },
+        "data.ImgUploadResponse": {
+            "type": "object",
+            "properties": {
+                "image_id": {
+                    "type": "string"
+                },
+                "upload_url": {
+                    "type": "string"
+                }
+            }
+        },
         "types.ProductInfo": {
             "type": "object",
             "properties": {
@@ -342,7 +409,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "",
 	BasePath:         "/product-ms/v1",
 	Schemes:          []string{},
 	Title:            "商品服务 API",

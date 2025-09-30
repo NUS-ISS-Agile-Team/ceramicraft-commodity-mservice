@@ -6,7 +6,6 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8080",
     "basePath": "/product-ms/v1",
     "paths": {
         "/merchant/add": {
@@ -38,6 +37,46 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/merchant/images/upload-urls": {
+            "post": {
+                "description": "Get presigned URL for image upload",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Get presigned URL for image upload",
+                "parameters": [
+                    {
+                        "description": "image id=hex(md5(img)).(jpg|png)",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/data.ImgUploadRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/data.ImgUploadResponse"
                         }
                     },
                     "400": {
@@ -265,6 +304,33 @@
                 },
                 "data": {},
                 "err_msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "data.ImgUploadRequest": {
+            "type": "object",
+            "required": [
+                "image_type"
+            ],
+            "properties": {
+                "image_type": {
+                    "type": "string",
+                    "enum": [
+                        "jpg",
+                        "png",
+                        "jpeg"
+                    ]
+                }
+            }
+        },
+        "data.ImgUploadResponse": {
+            "type": "object",
+            "properties": {
+                "image_id": {
+                    "type": "string"
+                },
+                "upload_url": {
                     "type": "string"
                 }
             }
