@@ -12,11 +12,12 @@ import (
 func NewRouter() *gin.Engine {
 	r := gin.Default()
 
-	// swagger router
-	r.GET("/swagger/*any", gs.WrapHandler(swaggerFiles.Handler))
 
 	v1 := r.Group("/product-ms/v1")
 	{
+		// swagger router
+		v1.GET("/swagger/*any", gs.WrapHandler(swaggerFiles.Handler))
+
 		v1.GET("/ping", func(c *gin.Context) {
 			c.JSON(200, gin.H{
 				"message": "pong",
