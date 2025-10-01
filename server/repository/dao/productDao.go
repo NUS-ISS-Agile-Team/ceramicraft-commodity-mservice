@@ -8,6 +8,7 @@ import (
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/log"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/repository"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/repository/model"
+
 	"gorm.io/gorm"
 )
 
@@ -17,6 +18,7 @@ type ProductDao interface {
 	GetProductByID(ctx context.Context, id int) (*model.Product, error)
 	UpdateProductStatus(ctx context.Context, id int, status int) error
 	UpdateProductStock(ctx context.Context, id int, stock int) error
+	ListProduct(ctx context.Context, q ListProductQuery) ([]*model.Product, int, error)
 }
 
 type ProductDaoImpl struct {
@@ -81,6 +83,52 @@ func (p *ProductDaoImpl) UpdateProductStock(ctx context.Context, id int, stock i
 		return err
 	}
 	return nil
+}
+
+// ListProduct 查询商品列表
+func (p *ProductDaoImpl) ListProduct(ctx context.Context, q ListProductQuery) ([]*model.Product, int, error) {
+	var products []*model.Product
+	var total int64
+
+	query := p.db.WithContext(ctx).Model(&model.Product{})
+
+	if q.Keyword != "" {
+		query = query.Where("name LIKE ?", "%"+q.Keyword+"%")
+	}
+
+	if q.Category != "" {
+		query = query.Where("category = ?", q.Category)
+	}
+
+	// 用户侧只能看到上架的商品
+	if q.IsCustomer {
+		query = query.Where("status = ?", 1)
+	}
+
+	if q.OrderBy == 0 {
+		query = query.Order("updated_at DESC")
+	} else {
+		query = query.Order("updated_at")
+	}
+
+	if q.Limit == 0 {
+		q.Limit = 10
+	}
+
+	// 获取总数
+	err := query.Count(&total).Error
+	if err != nil {
+		log.Logger.Errorf("Failed to count products: %v", err)
+		return nil, 0, err
+	}
+
+	err = query.Offset(q.Offset).Limit(q.Limit).Find(&products).Error
+	if err != nil {
+		log.Logger.Errorf("Failed to get products ordered by time: %v", err)
+		return nil, 0, err
+	}
+
+	return products, int(total), nil
 }
 
 // UpdateProductStatus 更新商品状态

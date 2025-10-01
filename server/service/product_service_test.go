@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/log"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/repository/dao"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/repository/dao/mocks"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/repository/model"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/types"
@@ -309,6 +310,226 @@ func TestProductServiceImpl_UnpublishProduct(t *testing.T) {
 	}
 }
 
+func TestProductServiceImpl_GetProductList(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	m := mocks.NewMockProductDao(ctrl)
+
+	// 准备测试数据
+	mockProducts := []*model.Product{
+		{
+			Name:             "陶瓷茶具1",
+			Category:         "茶具",
+			Price:            10000,
+			Desc:             "精美陶瓷茶具",
+			Stock:            100,
+			Status:           1, // 已上架
+			PicInfo:          "pic1.jpg",
+			Dimensions:       "10x10x10",
+			Material:         "陶瓷",
+			Weight:           "1kg",
+			Capacity:         "500ml",
+			CareInstructions: "小心轻放",
+		},
+		{
+			Name:             "陶瓷花瓶",
+			Category:         "装饰品",
+			Price:            20000,
+			Desc:             "中式陶瓷花瓶",
+			Stock:            50,
+			Status:           0, // 未上架
+			PicInfo:          "pic2.jpg",
+			Dimensions:       "20x20x30",
+			Material:         "陶瓷",
+			Weight:           "2kg",
+			Capacity:         "2L",
+			CareInstructions: "防摔",
+		},
+	}
+
+	testCases := []struct {
+		name        string
+		query       types.GetProductListQuery
+		mockResult  []*model.Product
+		mockCount   int
+		mockError   error
+		expectCount int
+		expectLen   int
+		expectError bool
+	}{
+		{
+			name: "成功获取商家端全部商品列表",
+			query: types.GetProductListQuery{
+				Offset:     0,
+				Limit:      10,
+				IsCustomer: false,
+				OrderBy:    0,
+			},
+			mockResult:  mockProducts,
+			mockCount:   2,
+			mockError:   nil,
+			expectCount: 2,
+			expectLen:   2,
+			expectError: false,
+		},
+		{
+			name: "成功获取用户端商品列表(只显示已上架)",
+			query: types.GetProductListQuery{
+				Offset:     0,
+				Limit:      10,
+				IsCustomer: true,
+				OrderBy:    0,
+			},
+			mockResult:  mockProducts[:1], // 只返回已上架的商品
+			mockCount:   1,
+			mockError:   nil,
+			expectCount: 1,
+			expectLen:   1,
+			expectError: false,
+		},
+		{
+			name: "按关键词搜索",
+			query: types.GetProductListQuery{
+				Keyword:    "茶具",
+				Offset:     0,
+				Limit:      10,
+				IsCustomer: true,
+				OrderBy:    0,
+			},
+			mockResult:  mockProducts[:1],
+			mockCount:   1,
+			mockError:   nil,
+			expectCount: 1,
+			expectLen:   1,
+			expectError: false,
+		},
+		{
+			name: "按分类筛选",
+			query: types.GetProductListQuery{
+				Category:   "茶具",
+				Offset:     0,
+				Limit:      10,
+				IsCustomer: true,
+				OrderBy:    0,
+			},
+			mockResult:  mockProducts[:1],
+			mockCount:   1,
+			mockError:   nil,
+			expectCount: 1,
+			expectLen:   1,
+			expectError: false,
+		},
+		{
+			name: "数据库错误",
+			query: types.GetProductListQuery{
+				Offset:     0,
+				Limit:      10,
+				IsCustomer: true,
+				OrderBy:    0,
+			},
+			mockResult:  nil,
+			mockCount:   0,
+			mockError:   errors.New("database error"),
+			expectCount: -1,
+			expectLen:   0,
+			expectError: true,
+		},
+		{
+			name: "空结果",
+			query: types.GetProductListQuery{
+				Keyword:    "不存在的商品",
+				Offset:     0,
+				Limit:      10,
+				IsCustomer: true,
+				OrderBy:    0,
+			},
+			mockResult:  []*model.Product{},
+			mockCount:   0,
+			mockError:   nil,
+			expectCount: 0,
+			expectLen:   0,
+			expectError: false,
+		},
+		{
+			name: "按更新时间升序",
+			query: types.GetProductListQuery{
+				Offset:     0,
+				Limit:      10,
+				IsCustomer: true,
+				OrderBy:    1, // 升序
+			},
+			mockResult:  mockProducts[:1],
+			mockCount:   1,
+			mockError:   nil,
+			expectCount: 1,
+			expectLen:   1,
+			expectError: false,
+		},
+	}
+
+	testProductServiceImpl := &ProductServiceImpl{
+		productDao: m,
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// 设置Mock期望
+			m.EXPECT().ListProduct(gomock.Any(), dao.ListProductQuery{
+				Keyword:    tc.query.Keyword,
+				Category:   tc.query.Category,
+				Offset:     tc.query.Offset,
+				Limit:      tc.query.Limit,
+				IsCustomer: tc.query.IsCustomer,
+				OrderBy:    tc.query.OrderBy,
+			}).Return(tc.mockResult, tc.mockCount, tc.mockError)
+
+			// 调用被测试的方法
+			products, count, err := testProductServiceImpl.GetProductList(context.Background(), tc.query)
+
+			// 验证结果
+			if tc.expectError {
+				if err == nil {
+					t.Errorf("Expected error but got none")
+				}
+			} else {
+				if err != nil {
+					t.Errorf("Unexpected error: %v", err)
+				}
+			}
+
+			if count != tc.expectCount {
+				t.Errorf("Expected count %d but got %d", tc.expectCount, count)
+			}
+
+			if len(products) != tc.expectLen {
+				t.Errorf("Expected %d products but got %d", tc.expectLen, len(products))
+			}
+
+			// 如果有返回结果，验证字段映射是否正确
+			if len(products) > 0 {
+				for i, p := range products {
+					if p.Name != tc.mockResult[i].Name {
+						t.Errorf("Product name mismatch at index %d: expected %s but got %s", i, tc.mockResult[i].Name, p.Name)
+					}
+					if p.Category != tc.mockResult[i].Category {
+						t.Errorf("Product category mismatch at index %d: expected %s but got %s", i, tc.mockResult[i].Category, p.Category)
+					}
+					if p.Price != tc.mockResult[i].Price {
+						t.Errorf("Product price mismatch at index %d: expected %d but got %d", i, tc.mockResult[i].Price, p.Price)
+					}
+					if p.Stock != tc.mockResult[i].Stock {
+						t.Errorf("Product stock mismatch at index %d: expected %d but got %d", i, tc.mockResult[i].Stock, p.Stock)
+					}
+					if p.Status != tc.mockResult[i].Status {
+						t.Errorf("Product status mismatch at index %d: expected %d but got %d", i, tc.mockResult[i].Status, p.Status)
+					}
+				}
+			}
+		})
+	}
+}
+
 func TestProductServiceImpl_UpdateProductStock(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -385,7 +606,7 @@ func TestProductServiceImpl_UpdateProductStock(t *testing.T) {
 		Stock:  50,
 		Status: 1,
 	}, nil)
-	
+
 	err = testProductServiceImpl.UpdateProductStock(context.Background(), 7, 60)
 	if err == nil {
 		t.Errorf("Expected error when updating stock for published product, got nil")

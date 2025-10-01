@@ -8,6 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	dao "github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/repository/dao"
 	model "github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/repository/model"
 	gomock "github.com/golang/mock/gomock"
 	gorm "gorm.io/gorm"
@@ -64,6 +65,22 @@ func (m *MockProductDao) GetProductByID(ctx context.Context, id int) (*model.Pro
 func (mr *MockProductDaoMockRecorder) GetProductByID(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProductByID", reflect.TypeOf((*MockProductDao)(nil).GetProductByID), ctx, id)
+}
+
+// ListProduct mocks base method.
+func (m *MockProductDao) ListProduct(ctx context.Context, q dao.ListProductQuery) ([]*model.Product, int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListProduct", ctx, q)
+	ret0, _ := ret[0].([]*model.Product)
+	ret1, _ := ret[1].(int)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// ListProduct indicates an expected call of ListProduct.
+func (mr *MockProductDaoMockRecorder) ListProduct(ctx, q interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProduct", reflect.TypeOf((*MockProductDao)(nil).ListProduct), ctx, q)
 }
 
 // UpdateProduct mocks base method.

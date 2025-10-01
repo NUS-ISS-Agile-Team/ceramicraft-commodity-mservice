@@ -31,6 +31,12 @@ func NewRouter() *gin.Engine {
 			merchantRouter.POST("/unpublish", api.UnpublishProduct)
 			merchantRouter.POST("/updateStock", api.UpdateProductStock)
 			merchantRouter.POST("/images/upload-urls", api.GetImageUploadPresignURL)
+			merchantRouter.GET("/list", api.GetMerchantProductList)
+		}
+
+		customerRouter := v1.Group("/customer")
+		{
+			customerRouter.GET("/list", api.GetCustomerProductList)
 		}
 
 	}
