@@ -13,7 +13,7 @@ log:
   file_path: ./logs/ceramicraft-commodity-mservice.log
 
 mysql:
-  host: "127.0.0.1" # mysql-container 127.0.0.1
+  host: "mysql-container" # mysql-container 127.0.0.1
   port: "3306"
   userName: "root"
   dbName: "product_db"
