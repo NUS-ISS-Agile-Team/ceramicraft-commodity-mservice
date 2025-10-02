@@ -37,7 +37,7 @@ func AddProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, data.ResponseSuccess(productId))
 }
 
-// GetProduct godoc
+// GetProductMerchant godoc
 // @Summary 获取商品详情
 // @Description 根据商品ID获取商品详细信息
 // @Tags 商品
@@ -49,7 +49,7 @@ func AddProduct(c *gin.Context) {
 // @Failure 404 {object} data.BaseResponse "商品不存在"
 // @Failure 500 {object} data.BaseResponse "服务器内部错误"
 // @Router /merchant/product/{id} [get]
-func GetProduct(c *gin.Context) {
+func GetProductMerchant(c *gin.Context) {
 	// 解析路径参数
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -299,4 +299,45 @@ func GetMerchantProductList(c *gin.Context) {
 		"total": total,
 		"list":  productList,
 	}))
+}
+
+
+// GetProductCustomer godoc
+// @Summary 获取商品详情(用户侧)
+// @Description 根据商品ID获取商品详细信息
+// @Tags 商品
+// @Accept json
+// @Produce json
+// @Param id path int true "商品ID"
+// @Success 200 {object} data.BaseResponse{data=types.ProductInfo} "成功"
+// @Failure 400 {object} data.BaseResponse "请求参数错误"
+// @Failure 404 {object} data.BaseResponse "商品不存在"
+// @Failure 500 {object} data.BaseResponse "服务器内部错误"
+// @Router /customer/product/{id} [get]
+func GetProductCustomer(c *gin.Context) {
+	// 解析路径参数
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Logger.Errorf("GetProduct: Invalid product ID: %v", err)
+		c.JSON(http.StatusBadRequest, data.ResponseFailed("Invalid product ID"))
+		return
+	}
+
+	// 调用 service 层获取商品信息
+	product, err := service.GetProductServiceInstance().GetPublishedProductByID(c.Request.Context(), id)
+	if err != nil {
+		log.Logger.Errorf("GetProduct: Failed to get product details: %v", err)
+		c.JSON(http.StatusInternalServerError, data.ResponseFailed("Failed to get product details"))
+		return
+	}
+
+	// 如果没找到商品
+	if product == nil {
+		c.JSON(http.StatusNotFound, data.ResponseFailed("Product not found"))
+		return
+	}
+
+	// 返回商品信息
+	c.JSON(http.StatusOK, data.ResponseSuccess(product))
 }

@@ -310,6 +310,86 @@ func TestProductServiceImpl_UnpublishProduct(t *testing.T) {
 	}
 }
 
+func TestProductServiceImpl_GetPublishedProductByID(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	m := mocks.NewMockProductDao(ctrl)
+	testProductServiceImpl := &ProductServiceImpl{
+		productDao: m,
+	}
+
+	// 测试获取已上架商品
+	publishedProduct := &model.Product{
+		Name:             "已上架商品",
+		Category:         "茶具",
+		Price:            10000,
+		Desc:             "精美陶瓷茶具",
+		Stock:            100,
+		Status:           1, // 已上架
+		PicInfo:          "pic1.jpg",
+		Dimensions:       "10x10x10",
+		Material:         "陶瓷",
+		Weight:           "1kg",
+		Capacity:         "500ml",
+		CareInstructions: "小心轻放",
+	}
+	m.EXPECT().GetProductByID(context.Background(), 1).Return(publishedProduct, nil)
+
+	productInfo, err := testProductServiceImpl.GetPublishedProductByID(context.Background(), 1)
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+	if productInfo == nil {
+		t.Error("Expected product info, got nil")
+	} else {
+		// 验证返回的商品信息是否正确
+		if productInfo.Name != publishedProduct.Name {
+			t.Errorf("Expected name %s, got %s", publishedProduct.Name, productInfo.Name)
+		}
+		if productInfo.Status != publishedProduct.Status {
+			t.Errorf("Expected status %d, got %d", publishedProduct.Status, productInfo.Status)
+		}
+	}
+
+	// 测试获取未上架商品（应返回nil）
+	unpublishedProduct := &model.Product{
+		Name:   "未上架商品",
+		Status: 0, // 未上架
+	}
+	m.EXPECT().GetProductByID(context.Background(), 2).Return(unpublishedProduct, nil)
+
+	productInfo, err = testProductServiceImpl.GetPublishedProductByID(context.Background(), 2)
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+	if productInfo != nil {
+		t.Error("Expected nil for unpublished product, got product info")
+	}
+
+	// 测试获取不存在的商品
+	m.EXPECT().GetProductByID(context.Background(), 3).Return(nil, nil)
+
+	productInfo, err = testProductServiceImpl.GetPublishedProductByID(context.Background(), 3)
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+	if productInfo != nil {
+		t.Error("Expected nil for non-existent product, got product info")
+	}
+
+	// 测试数据库错误的情况
+	m.EXPECT().GetProductByID(context.Background(), 4).Return(nil, errors.New("database error"))
+
+	productInfo, err = testProductServiceImpl.GetPublishedProductByID(context.Background(), 4)
+	if err == nil {
+		t.Error("Expected database error, got nil")
+	}
+	if productInfo != nil {
+		t.Error("Expected nil product info when database error occurs")
+	}
+}
+
 func TestProductServiceImpl_GetProductList(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()

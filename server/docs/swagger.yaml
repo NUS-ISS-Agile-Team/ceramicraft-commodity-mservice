@@ -112,6 +112,44 @@ paths:
       summary: 用户端获取商品列表
       tags:
       - 商品
+  /customer/product/{id}:
+    get:
+      consumes:
+      - application/json
+      description: 根据商品ID获取商品详细信息
+      parameters:
+      - description: 商品ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/types.ProductInfo'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "404":
+          description: 商品不存在
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: 获取商品详情(用户侧)
+      tags:
+      - 商品
   /merchant/add:
     post:
       consumes:

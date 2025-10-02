@@ -32,7 +32,7 @@ func NewRouter() *gin.Engine {
 		{
 			merchantRouter.Use(middleware.AuthMiddleware())
 			merchantRouter.POST("/add", api.AddProduct)
-			merchantRouter.GET("/product/:id", api.GetProduct)
+			merchantRouter.GET("/product/:id", api.GetProductMerchant)
 			merchantRouter.POST("/publish", api.PublishProduct)
 			merchantRouter.POST("/unpublish", api.UnpublishProduct)
 			merchantRouter.POST("/updateStock", api.UpdateProductStock)
@@ -43,6 +43,7 @@ func NewRouter() *gin.Engine {
 		customerRouter := baseRouter.Group("/customer")
 		{
 			customerRouter.GET("/list", api.GetCustomerProductList)
+			customerRouter.GET("/product/:id", api.GetProductCustomer)
 
 			authed := customerRouter.Group("")
 			{

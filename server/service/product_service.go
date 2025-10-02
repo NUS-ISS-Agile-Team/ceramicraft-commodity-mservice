@@ -84,6 +84,32 @@ const (
 	ProductStatusPublished   = 1 // 上架状态
 )
 
+// GetProductByID 根据ID获取产品信息 (用户侧， 只有上架的商品才能查看详情页)
+func (p *ProductServiceImpl) GetPublishedProductByID(ctx context.Context, id int) (productInfo *types.ProductInfo, err error) {
+	product, err := p.productDao.GetProductByID(ctx, id)
+	if err != nil {
+		log.Logger.Errorf("ProductService: Failed to get product by ID: %v", err)
+		return nil, err
+	}
+	if product == nil || product.Status == ProductStatusUnpublished {
+		return nil, nil
+	}
+	return &types.ProductInfo{
+		Name:             product.Name,
+		Category:         product.Category,
+		Price:            product.Price,
+		Desc:             product.Desc,
+		Stock:            product.Stock,
+		PicInfo:          product.PicInfo,
+		Weight:           product.Weight,
+		Material:         product.Material,
+		Capacity:         product.Capacity,
+		Dimensions:       product.Dimensions,
+		CareInstructions: product.CareInstructions,
+		Status:           product.Status,
+	}, nil
+}
+
 // PublishProduct 上架商品
 func (p *ProductServiceImpl) PublishProduct(ctx context.Context, id int) error {
 	// 获取商品当前信息
