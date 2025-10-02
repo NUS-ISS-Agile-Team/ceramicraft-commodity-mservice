@@ -25,6 +25,7 @@ services:
       - "8080:8080"   # 只给宿主机（ZAP）用
     environment:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
     command: ["sh", "-c", "apt-get update && apt-get install -y netcat-openbsd && chmod +x /app/wait-for.sh && ./wait-for.sh mysql-container 3306 ./main"]
     volumes:
       - ./wait-for.sh:/app/wait-for.sh   # CI 专用配置

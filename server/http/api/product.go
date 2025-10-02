@@ -37,7 +37,7 @@ func AddProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, data.ResponseSuccess(productId))
 }
 
-// GetProduct godoc
+// GetProductMerchant godoc
 // @Summary 获取商品详情
 // @Description 根据商品ID获取商品详细信息
 // @Tags 商品
@@ -49,7 +49,7 @@ func AddProduct(c *gin.Context) {
 // @Failure 404 {object} data.BaseResponse "商品不存在"
 // @Failure 500 {object} data.BaseResponse "服务器内部错误"
 // @Router /merchant/product/{id} [get]
-func GetProduct(c *gin.Context) {
+func GetProductMerchant(c *gin.Context) {
 	// 解析路径参数
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -165,3 +165,179 @@ func UpdateProductStock(c *gin.Context) {
 	c.JSON(http.StatusOK, data.ResponseSuccess(nil))
 }
 
+// GetCustomerProductList godoc
+// @Summary 用户端获取商品列表
+// @Description 支持按关键词搜索、分类筛选、分页，并按更新时间排序
+// @Tags 商品
+// @Accept json
+// @Produce json
+// @Param keyword query string false "搜索关键词"
+// @Param category query string false "商品分类"
+// @Param offset query int false "偏移量，默认0"
+// @Param order_by query int false "排序方式：0-按更新时间降序，1-按更新时间升序，默认0"
+// @Success 200 {object} data.BaseResponse
+// @Failure 400 {object} data.BaseResponse
+// @Failure 500 {object} data.BaseResponse
+// @Router /customer/list [get]
+func GetCustomerProductList(c *gin.Context) {
+	var req types.GetProductListRequest
+
+	// 获取查询参数
+	req.Keyword = c.Query("keyword")
+	req.Category = c.Query("category")
+	offsetStr := c.Query("offset")
+	orderByStr := c.DefaultQuery("order_by", "0")
+
+	// 处理offset参数
+	if offsetStr != "" {
+		offset, err := strconv.Atoi(offsetStr)
+		if err != nil {
+			log.Logger.Errorf("GetCustomerProductList: Invalid offset parameter: %v", err)
+			c.JSON(http.StatusBadRequest, data.ResponseFailed("Invalid offset parameter"))
+			return
+		}
+		req.Offset = offset
+	}
+
+	// 处理order_by参数
+	orderBy, err := strconv.Atoi(orderByStr)
+	if err != nil || (orderBy != 0 && orderBy != 1) {
+		log.Logger.Errorf("GetCustomerProductList: Invalid order_by parameter: %v", err)
+		c.JSON(http.StatusBadRequest, data.ResponseFailed("Invalid order_by parameter"))
+		return
+	}
+	req.OrderBy = orderBy
+
+	// 构造service层参数
+	query := types.GetProductListQuery{
+		Keyword:    req.Keyword,
+		Limit:      10,
+		Offset:     req.Offset,
+		OrderBy:    req.OrderBy,
+		Category:   req.Category,
+		IsCustomer: true,
+	}
+
+	// 调用service层获取商品列表
+	productList, total, err := service.GetProductServiceInstance().GetProductList(c.Request.Context(), query)
+	if err != nil {
+		log.Logger.Errorf("GetCustomerProductList: Failed to get product list: %v", err)
+		c.JSON(http.StatusInternalServerError, data.ResponseFailed("Failed to get product list"))
+		return
+	}
+
+	// 返回结果
+	c.JSON(http.StatusOK, data.ResponseSuccess(gin.H{
+		"total": total,
+		"list":  productList,
+	}))
+}
+
+// GetMerchantProductList godoc
+// @Summary 商家端获取商品列表
+// @Description 支持按关键词搜索、分类筛选、分页，并按更新时间排序
+// @Tags 商品
+// @Accept json
+// @Produce json
+// @Param keyword query string false "搜索关键词"
+// @Param category query string false "商品分类"
+// @Param offset query int false "偏移量，默认0"
+// @Param order_by query int false "排序方式：0-按更新时间降序，1-按更新时间升序，默认0"
+// @Success 200 {object} data.BaseResponse
+// @Failure 400 {object} data.BaseResponse
+// @Failure 500 {object} data.BaseResponse
+// @Router /merchant/list [get]
+func GetMerchantProductList(c *gin.Context) {
+	var req types.GetProductListRequest
+
+	// 获取查询参数
+	req.Keyword = c.Query("keyword")
+	req.Category = c.Query("category")
+	offsetStr := c.Query("offset")
+	orderByStr := c.DefaultQuery("order_by", "0")
+
+	// 处理offset参数
+	if offsetStr != "" {
+		offset, err := strconv.Atoi(offsetStr)
+		if err != nil {
+			log.Logger.Errorf("GetMerchantProductList: Invalid offset parameter: %v", err)
+			c.JSON(http.StatusBadRequest, data.ResponseFailed("Invalid offset parameter"))
+			return
+		}
+		req.Offset = offset
+	}
+
+	// 处理order_by参数
+	orderBy, err := strconv.Atoi(orderByStr)
+	if err != nil || (orderBy != 0 && orderBy != 1) {
+		log.Logger.Errorf("GetMerchantProductList: Invalid order_by parameter: %v", err)
+		c.JSON(http.StatusBadRequest, data.ResponseFailed("Invalid order_by parameter"))
+		return
+	}
+	req.OrderBy = orderBy
+
+	// 构造service层参数
+	query := types.GetProductListQuery{
+		Keyword:    req.Keyword,
+		Limit:      10,
+		Offset:     req.Offset,
+		OrderBy:    req.OrderBy,
+		Category:   req.Category,
+		IsCustomer: false,
+	}
+
+	// 调用service层获取商品列表
+	productList, total, err := service.GetProductServiceInstance().GetProductList(c.Request.Context(), query)
+	if err != nil {
+		log.Logger.Errorf("GetMerchantProductList: Failed to get product list: %v", err)
+		c.JSON(http.StatusInternalServerError, data.ResponseFailed("Failed to get product list"))
+		return
+	}
+
+	// 返回结果
+	c.JSON(http.StatusOK, data.ResponseSuccess(gin.H{
+		"total": total,
+		"list":  productList,
+	}))
+}
+
+
+// GetProductCustomer godoc
+// @Summary 获取商品详情(用户侧)
+// @Description 根据商品ID获取商品详细信息
+// @Tags 商品
+// @Accept json
+// @Produce json
+// @Param id path int true "商品ID"
+// @Success 200 {object} data.BaseResponse{data=types.ProductInfo} "成功"
+// @Failure 400 {object} data.BaseResponse "请求参数错误"
+// @Failure 404 {object} data.BaseResponse "商品不存在"
+// @Failure 500 {object} data.BaseResponse "服务器内部错误"
+// @Router /customer/product/{id} [get]
+func GetProductCustomer(c *gin.Context) {
+	// 解析路径参数
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Logger.Errorf("GetProduct: Invalid product ID: %v", err)
+		c.JSON(http.StatusBadRequest, data.ResponseFailed("Invalid product ID"))
+		return
+	}
+
+	// 调用 service 层获取商品信息
+	product, err := service.GetProductServiceInstance().GetPublishedProductByID(c.Request.Context(), id)
+	if err != nil {
+		log.Logger.Errorf("GetProduct: Failed to get product details: %v", err)
+		c.JSON(http.StatusInternalServerError, data.ResponseFailed("Failed to get product details"))
+		return
+	}
+
+	// 如果没找到商品
+	if product == nil {
+		c.JSON(http.StatusNotFound, data.ResponseFailed("Product not found"))
+		return
+	}
+
+	// 返回商品信息
+	c.JSON(http.StatusOK, data.ResponseSuccess(product))
+}

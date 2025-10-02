@@ -18,6 +18,7 @@ type ProductService interface {
 
 	// 商家后台更新商品库存
 	UpdateProductStock(ctx context.Context, id int, newStock int) error
+	GetProductList(ctx context.Context, req types.GetProductListQuery) (list []*types.ProductInfo, count int, err error)
 }
 
 type ProductServiceImpl struct {
@@ -82,6 +83,32 @@ const (
 	ProductStatusUnpublished = 0 // 下架状态
 	ProductStatusPublished   = 1 // 上架状态
 )
+
+// GetProductByID 根据ID获取产品信息 (用户侧， 只有上架的商品才能查看详情页)
+func (p *ProductServiceImpl) GetPublishedProductByID(ctx context.Context, id int) (productInfo *types.ProductInfo, err error) {
+	product, err := p.productDao.GetProductByID(ctx, id)
+	if err != nil {
+		log.Logger.Errorf("ProductService: Failed to get product by ID: %v", err)
+		return nil, err
+	}
+	if product == nil || product.Status == ProductStatusUnpublished {
+		return nil, nil
+	}
+	return &types.ProductInfo{
+		Name:             product.Name,
+		Category:         product.Category,
+		Price:            product.Price,
+		Desc:             product.Desc,
+		Stock:            product.Stock,
+		PicInfo:          product.PicInfo,
+		Weight:           product.Weight,
+		Material:         product.Material,
+		Capacity:         product.Capacity,
+		Dimensions:       product.Dimensions,
+		CareInstructions: product.CareInstructions,
+		Status:           product.Status,
+	}, nil
+}
 
 // PublishProduct 上架商品
 func (p *ProductServiceImpl) PublishProduct(ctx context.Context, id int) error {
@@ -171,4 +198,39 @@ func (p *ProductServiceImpl) UpdateProductStock(ctx context.Context, id int, new
 	}
 
 	return nil
+}
+
+func (p *ProductServiceImpl) GetProductList(ctx context.Context, req types.GetProductListQuery) (list []*types.ProductInfo, count int, err error) {
+	listRaw, cnt, err := p.productDao.ListProduct(ctx, dao.ListProductQuery{
+		Keyword:    req.Keyword,
+		Category:   req.Category,
+		Offset:     req.Offset,
+		Limit:      req.Limit,
+		IsCustomer: req.IsCustomer,
+		OrderBy:    req.OrderBy,
+	})
+	if err != nil {
+		log.Logger.Errorf("GetProductList: Failed to get product list, err: %v", err)
+		return nil, -1, err
+	}
+
+	list = make([]*types.ProductInfo, len(listRaw))
+	for k, listModel := range listRaw {
+		list[k] = &types.ProductInfo{
+			Name:             listModel.Name,
+			Category:         listModel.Category,
+			Price:            listModel.Price,
+			Desc:             listModel.Desc,
+			Stock:            listModel.Stock,
+			PicInfo:          listModel.PicInfo,
+			Dimensions:       listModel.Dimensions,
+			Material:         listModel.Material,
+			Weight:           listModel.Weight,
+			Capacity:         listModel.Capacity,
+			CareInstructions: listModel.CareInstructions,
+			Status:           listModel.Status,
+		}
+	}
+
+	return list, cnt, nil
 }

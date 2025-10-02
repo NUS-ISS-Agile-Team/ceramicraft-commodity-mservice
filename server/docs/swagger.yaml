@@ -72,6 +72,84 @@ info:
   title: 商品服务 API
   version: "1.0"
 paths:
+  /customer/list:
+    get:
+      consumes:
+      - application/json
+      description: 支持按关键词搜索、分类筛选、分页，并按更新时间排序
+      parameters:
+      - description: 搜索关键词
+        in: query
+        name: keyword
+        type: string
+      - description: 商品分类
+        in: query
+        name: category
+        type: string
+      - description: 偏移量，默认0
+        in: query
+        name: offset
+        type: integer
+      - description: 排序方式：0-按更新时间降序，1-按更新时间升序，默认0
+        in: query
+        name: order_by
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: 用户端获取商品列表
+      tags:
+      - 商品
+  /customer/product/{id}:
+    get:
+      consumes:
+      - application/json
+      description: 根据商品ID获取商品详细信息
+      parameters:
+      - description: 商品ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/types.ProductInfo'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "404":
+          description: 商品不存在
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: 获取商品详情(用户侧)
+      tags:
+      - 商品
   /merchant/add:
     post:
       consumes:
@@ -104,7 +182,7 @@ paths:
       - application/json
       description: Get presigned URL for image upload
       parameters:
-      - description: image id=hex(md5(img)).(jpg|png)
+      - description: image_type=(jpg|jpeg|png)
         in: body
         name: product
         required: true
@@ -124,6 +202,46 @@ paths:
       summary: Get presigned URL for image upload
       tags:
       - Image
+  /merchant/list:
+    get:
+      consumes:
+      - application/json
+      description: 支持按关键词搜索、分类筛选、分页，并按更新时间排序
+      parameters:
+      - description: 搜索关键词
+        in: query
+        name: keyword
+        type: string
+      - description: 商品分类
+        in: query
+        name: category
+        type: string
+      - description: 偏移量，默认0
+        in: query
+        name: offset
+        type: integer
+      - description: 排序方式：0-按更新时间降序，1-按更新时间升序，默认0
+        in: query
+        name: order_by
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: 商家端获取商品列表
+      tags:
+      - 商品
   /merchant/product/{id}:
     get:
       consumes:

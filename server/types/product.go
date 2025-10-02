@@ -16,10 +16,26 @@ type ProductInfo struct {
 }
 
 type UpdateProductStatusRequest struct {
-	ID     int `json:"id"`
+	ID int `json:"id"`
 }
 
 type UpdateProductStockRequest struct {
-	ID    int   `json:"id"`
+	ID    int `json:"id"`
 	Stock int `json:"stock"`
+}
+
+type GetProductListQuery struct {
+	Keyword    string `json:"keyword"`
+	Category   string `json:"category"`
+	Offset     int    `json:"offset"`
+	Limit      int    `json:"limit"`
+	IsCustomer bool   `json:"is_customer"`
+	OrderBy    int    `json:"order_by"` // 0-updateTime desc, 1-updateTime inc
+}
+
+type GetProductListRequest struct {
+	Keyword    string `json:"keyword"`
+	Category   string `json:"category"`
+	Offset     int    `json:"offset"`
+	OrderBy    int    `json:"order_by"` // 0-updateTime desc, 1-updateTime inc
 }
