@@ -52,7 +52,7 @@ jobs:
         run: |
           docker stop ceramicraft-commodity-mservice || true
           docker rm ceramicraft-commodity-mservice || true
-          docker run -d --name ceramicraft-commodity-mservice --network ceramicraft-network -e MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} "${DOCKER_HUB_USERNAME}/ceramicraft-commodity-mservice:${{ github.event.inputs.version }}"
+          docker run -d --name ceramicraft-commodity-mservice --network ceramicraft-network -e MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} -e JWT_SECRET=${{ secrets.JWT_SECRET }} "${DOCKER_HUB_USERNAME}/ceramicraft-commodity-mservice:${{ github.event.inputs.version }}"
   restart:
     if: ${{ github.event.inputs.command == 'restart' }}
     runs-on: self-hosted
