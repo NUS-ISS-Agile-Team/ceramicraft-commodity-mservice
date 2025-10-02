@@ -200,7 +200,7 @@ func (p *ProductServiceImpl) UpdateProductStock(ctx context.Context, id int, new
 	return nil
 }
 
-func (p *ProductServiceImpl) GetProductList(ctx context.Context, req types.GetProductListQuery) (list []*types.ProductInfo, count int, err error) {
+func (p *ProductServiceImpl) GetProductList(ctx context.Context, req types.GetProductListQuery) (list []*types.ProductSimpilfiedInfo, count int, err error) {
 	listRaw, cnt, err := p.productDao.ListProduct(ctx, dao.ListProductQuery{
 		Keyword:    req.Keyword,
 		Category:   req.Category,
@@ -214,21 +214,17 @@ func (p *ProductServiceImpl) GetProductList(ctx context.Context, req types.GetPr
 		return nil, -1, err
 	}
 
-	list = make([]*types.ProductInfo, len(listRaw))
+	list = make([]*types.ProductSimpilfiedInfo, len(listRaw))
 	for k, listModel := range listRaw {
-		list[k] = &types.ProductInfo{
-			Name:             listModel.Name,
-			Category:         listModel.Category,
-			Price:            listModel.Price,
-			Desc:             listModel.Desc,
-			Stock:            listModel.Stock,
-			PicInfo:          listModel.PicInfo,
-			Dimensions:       listModel.Dimensions,
-			Material:         listModel.Material,
-			Weight:           listModel.Weight,
-			Capacity:         listModel.Capacity,
-			CareInstructions: listModel.CareInstructions,
-			Status:           listModel.Status,
+		list[k] = &types.ProductSimpilfiedInfo{
+			ID:       int(listModel.ID),
+			Name:     listModel.Name,
+			Category: listModel.Category,
+			Price:    listModel.Price,
+			Desc:     listModel.Desc,
+			Stock:    listModel.Stock,
+			PicInfo:  listModel.PicInfo,
+			Status:   listModel.Status,
 		}
 	}
 
