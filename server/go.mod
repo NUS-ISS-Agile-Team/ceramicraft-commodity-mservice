@@ -6,6 +6,7 @@ toolchain go1.24.7
 
 require (
 	github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/common v0.0.0-20250925130112-b8a0b5fd7347
+	github.com/NUS-ISS-Agile-Team/ceramicraft-user-mservice/common v0.0.0-20251002010254-c2e634433342
 	github.com/aws/aws-sdk-go-v2 v1.39.2
 	github.com/aws/aws-sdk-go-v2/config v1.31.12
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.88.3
@@ -70,6 +71,7 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/goccy/go-yaml v1.18.0 // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
