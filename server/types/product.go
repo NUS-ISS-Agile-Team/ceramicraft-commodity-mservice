@@ -15,6 +15,17 @@ type ProductInfo struct {
 	Status           int32  `json:"status"` // 0: 未上架, 1: 已上架
 }
 
+type ProductSimpilfiedInfo struct {
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	Category string `json:"category"`
+	Price    int64  `json:"price"`
+	Desc     string `json:"desc"`
+	Stock    int64  `json:"stock"`
+	PicInfo  string `json:"pic_info"`
+	Status   int32  `json:"status"` // 0: 未上架, 1: 已上架
+}
+
 type UpdateProductStatusRequest struct {
 	ID int `json:"id"`
 }
@@ -34,8 +45,8 @@ type GetProductListQuery struct {
 }
 
 type GetProductListRequest struct {
-	Keyword    string `json:"keyword"`
-	Category   string `json:"category"`
-	Offset     int    `json:"offset"`
-	OrderBy    int    `json:"order_by"` // 0-updateTime desc, 1-updateTime inc
+	Keyword  string `json:"keyword"`
+	Category string `json:"category"`
+	Offset   int    `json:"offset"`
+	OrderBy  int    `json:"order_by"` // 0-updateTime desc, 1-updateTime inc
 }
