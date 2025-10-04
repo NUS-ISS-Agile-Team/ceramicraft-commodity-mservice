@@ -11,7 +11,6 @@ import (
 	dao "github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/repository/dao"
 	model "github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/repository/model"
 	gomock "github.com/golang/mock/gomock"
-	gorm "gorm.io/gorm"
 )
 
 // MockProductDao is a mock of ProductDao interface.
@@ -83,20 +82,6 @@ func (mr *MockProductDaoMockRecorder) ListProduct(ctx, q interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProduct", reflect.TypeOf((*MockProductDao)(nil).ListProduct), ctx, q)
 }
 
-// UpdateProduct mocks base method.
-func (m *MockProductDao) UpdateProduct(ctx context.Context, product *model.Product, tx *gorm.DB) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateProduct", ctx, product, tx)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// UpdateProduct indicates an expected call of UpdateProduct.
-func (mr *MockProductDaoMockRecorder) UpdateProduct(ctx, product, tx interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProduct", reflect.TypeOf((*MockProductDao)(nil).UpdateProduct), ctx, product, tx)
-}
-
 // UpdateProductStatus mocks base method.
 func (m *MockProductDao) UpdateProductStatus(ctx context.Context, id, status int) error {
 	m.ctrl.T.Helper()
@@ -123,4 +108,18 @@ func (m *MockProductDao) UpdateProductStock(ctx context.Context, id, stock int) 
 func (mr *MockProductDaoMockRecorder) UpdateProductStock(ctx, id, stock interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProductStock", reflect.TypeOf((*MockProductDao)(nil).UpdateProductStock), ctx, id, stock)
+}
+
+// UpdateStockWithCAS mocks base method.
+func (m *MockProductDao) UpdateStockWithCAS(ctx context.Context, id, version, newStock int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateStockWithCAS", ctx, id, version, newStock)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateStockWithCAS indicates an expected call of UpdateStockWithCAS.
+func (mr *MockProductDaoMockRecorder) UpdateStockWithCAS(ctx, id, version, newStock interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateStockWithCAS", reflect.TypeOf((*MockProductDao)(nil).UpdateStockWithCAS), ctx, id, version, newStock)
 }

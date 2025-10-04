@@ -14,7 +14,7 @@ import (
 
 type ProductDao interface {
 	CreateProduct(ctx context.Context, product *model.Product) (productId int, err error)
-	UpdateProduct(ctx context.Context, product *model.Product, tx *gorm.DB) error
+	UpdateStockWithCAS(ctx context.Context, id int, version int, newStock int) error
 	GetProductByID(ctx context.Context, id int) (*model.Product, error)
 	UpdateProductStatus(ctx context.Context, id int, status int) error
 	UpdateProductStock(ctx context.Context, id int, stock int) error
@@ -49,11 +49,11 @@ func (p *ProductDaoImpl) CreateProduct(ctx context.Context, product *model.Produ
 	return int(product.ID), nil
 }
 
-// UpdateProduct 更新产品信息
-func (p *ProductDaoImpl) UpdateProduct(ctx context.Context, product *model.Product, tx *gorm.DB) error {
-	ret := tx.WithContext(ctx).Model(&model.Product{}).Where("id = ?", product.ID).Updates(product)
+// UpdateStockWithCAS 
+func (p *ProductDaoImpl) UpdateStockWithCAS(ctx context.Context, id, version, newStock int) error {
+	ret := p.db.WithContext(ctx).Model(&model.Product{}).Where("id = ? AND version = ?", id, version).Update("stock", newStock)
 	if ret.Error != nil {
-		log.Logger.Errorf("Failed to update product ID %d: %v", product.ID, ret.Error)
+		log.Logger.Errorf("Failed to update product ID %d: %v", id, ret.Error)
 		return ret.Error
 	}
 	return nil

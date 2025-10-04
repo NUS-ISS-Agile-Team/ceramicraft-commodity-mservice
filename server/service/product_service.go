@@ -19,6 +19,8 @@ type ProductService interface {
 	// 商家后台更新商品库存
 	UpdateProductStock(ctx context.Context, id int, newStock int) error
 	GetProductList(ctx context.Context, req types.GetProductListQuery) (list []*types.ProductInfo, count int, err error)
+
+	UpdateStockWithCAS(ctx context.Context, id int, deta int) error
 }
 
 type ProductServiceImpl struct {
@@ -229,4 +231,26 @@ func (p *ProductServiceImpl) GetProductList(ctx context.Context, req types.GetPr
 	}
 
 	return list, cnt, nil
+}
+
+func (p *ProductServiceImpl) UpdateStockWithCAS(ctx context.Context, id, deta int) error {
+	pModel, err := p.productDao.GetProductByID(ctx, id)
+	if err != nil {
+		log.Logger.Errorf("UpdateStockWithCAS: get product failed, err: %s", err.Error())
+		return err
+	}
+
+	if int(pModel.Stock) + deta < 0 {
+		log.Logger.Errorf("UpdateStockWithCAS: do not have enough stock, product id: %d, current stock: %d", id, int(pModel.Stock))
+		return fmt.Errorf("do not have enough stock, product id: %d, current stock: %d", id, int(pModel.Stock))
+	}
+
+	newStock := int(pModel.Stock) + deta
+	err = p.productDao.UpdateStockWithCAS(ctx, id, int(pModel.Version), newStock)
+	if err != nil {
+		log.Logger.Errorf("UpdateStockWithCAS: update failed, err:%s", err.Error())
+		return err
+	}
+
+	return nil
 }

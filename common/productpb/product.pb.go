@@ -21,72 +21,89 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type GetProductRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
+// 响应状态码定义
+type ResponseCode int32
 
-func (x *GetProductRequest) Reset() {
-	*x = GetProductRequest{}
-	mi := &file_proto_product_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+const (
+	ResponseCode_SUCCESS            ResponseCode = 0    // 成功
+	ResponseCode_INTERNAL_ERROR     ResponseCode = 500  // 内部错误
+	ResponseCode_INVALID_PARAM      ResponseCode = 400  // 参数错误
+	ResponseCode_NOT_FOUND          ResponseCode = 404  // 资源不找到
+	ResponseCode_CONFLICT           ResponseCode = 409  // 资源冲突（例如乐观锁冲突）
+	ResponseCode_INSUFFICIENT_STOCK ResponseCode = 4001 // 库存不足
+)
 
-func (x *GetProductRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetProductRequest) ProtoMessage() {}
-
-func (x *GetProductRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_product_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
+// Enum value maps for ResponseCode.
+var (
+	ResponseCode_name = map[int32]string{
+		0:    "SUCCESS",
+		500:  "INTERNAL_ERROR",
+		400:  "INVALID_PARAM",
+		404:  "NOT_FOUND",
+		409:  "CONFLICT",
+		4001: "INSUFFICIENT_STOCK",
 	}
-	return mi.MessageOf(x)
+	ResponseCode_value = map[string]int32{
+		"SUCCESS":            0,
+		"INTERNAL_ERROR":     500,
+		"INVALID_PARAM":      400,
+		"NOT_FOUND":          404,
+		"CONFLICT":           409,
+		"INSUFFICIENT_STOCK": 4001,
+	}
+)
+
+func (x ResponseCode) Enum() *ResponseCode {
+	p := new(ResponseCode)
+	*p = x
+	return p
 }
 
-// Deprecated: Use GetProductRequest.ProtoReflect.Descriptor instead.
-func (*GetProductRequest) Descriptor() ([]byte, []int) {
+func (x ResponseCode) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ResponseCode) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_product_proto_enumTypes[0].Descriptor()
+}
+
+func (ResponseCode) Type() protoreflect.EnumType {
+	return &file_proto_product_proto_enumTypes[0]
+}
+
+func (x ResponseCode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ResponseCode.Descriptor instead.
+func (ResponseCode) EnumDescriptor() ([]byte, []int) {
 	return file_proto_product_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *GetProductRequest) GetId() int64 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
-type GetProductResponse struct {
+type BaseResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Product       *Product               `protobuf:"bytes,1,opt,name=product,proto3" json:"product,omitempty"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"` // 响应码，0表示成功，非0表示错误
+	Msg           string                 `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`    // 响应信息，成功或错误描述
+	Data          []byte                 `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`  // 响应数据，可以是任何类型的序列化数据
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetProductResponse) Reset() {
-	*x = GetProductResponse{}
-	mi := &file_proto_product_proto_msgTypes[1]
+func (x *BaseResponse) Reset() {
+	*x = BaseResponse{}
+	mi := &file_proto_product_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetProductResponse) String() string {
+func (x *BaseResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetProductResponse) ProtoMessage() {}
+func (*BaseResponse) ProtoMessage() {}
 
-func (x *GetProductResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_product_proto_msgTypes[1]
+func (x *BaseResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_product_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -97,76 +114,126 @@ func (x *GetProductResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetProductResponse.ProtoReflect.Descriptor instead.
-func (*GetProductResponse) Descriptor() ([]byte, []int) {
-	return file_proto_product_proto_rawDescGZIP(), []int{1}
+// Deprecated: Use BaseResponse.ProtoReflect.Descriptor instead.
+func (*BaseResponse) Descriptor() ([]byte, []int) {
+	return file_proto_product_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *GetProductResponse) GetProduct() *Product {
+func (x *BaseResponse) GetCode() int32 {
 	if x != nil {
-		return x.Product
-	}
-	return nil
-}
-
-type Product struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Price         int64                  `protobuf:"varint,3,opt,name=price,proto3" json:"price,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Product) Reset() {
-	*x = Product{}
-	mi := &file_proto_product_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Product) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Product) ProtoMessage() {}
-
-func (x *Product) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_product_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Product.ProtoReflect.Descriptor instead.
-func (*Product) Descriptor() ([]byte, []int) {
-	return file_proto_product_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *Product) GetId() int64 {
-	if x != nil {
-		return x.Id
+		return x.Code
 	}
 	return 0
 }
 
-func (x *Product) GetName() string {
+func (x *BaseResponse) GetMsg() string {
 	if x != nil {
-		return x.Name
+		return x.Msg
 	}
 	return ""
 }
 
-func (x *Product) GetPrice() int64 {
+func (x *BaseResponse) GetData() []byte {
 	if x != nil {
-		return x.Price
+		return x.Data
+	}
+	return nil
+}
+
+type UpdateStockWithCASRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Deta          int64                  `protobuf:"varint,2,opt,name=deta,proto3" json:"deta,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateStockWithCASRequest) Reset() {
+	*x = UpdateStockWithCASRequest{}
+	mi := &file_proto_product_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateStockWithCASRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateStockWithCASRequest) ProtoMessage() {}
+
+func (x *UpdateStockWithCASRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_product_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateStockWithCASRequest.ProtoReflect.Descriptor instead.
+func (*UpdateStockWithCASRequest) Descriptor() ([]byte, []int) {
+	return file_proto_product_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *UpdateStockWithCASRequest) GetId() int64 {
+	if x != nil {
+		return x.Id
 	}
 	return 0
+}
+
+func (x *UpdateStockWithCASRequest) GetDeta() int64 {
+	if x != nil {
+		return x.Deta
+	}
+	return 0
+}
+
+type UpdateStockWithCASResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *BaseResponse          `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 基础响应信息
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateStockWithCASResponse) Reset() {
+	*x = UpdateStockWithCASResponse{}
+	mi := &file_proto_product_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateStockWithCASResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateStockWithCASResponse) ProtoMessage() {}
+
+func (x *UpdateStockWithCASResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_product_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateStockWithCASResponse.ProtoReflect.Descriptor instead.
+func (*UpdateStockWithCASResponse) Descriptor() ([]byte, []int) {
+	return file_proto_product_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *UpdateStockWithCASResponse) GetBase() *BaseResponse {
+	if x != nil {
+		return x.Base
+	}
+	return nil
 }
 
 var File_proto_product_proto protoreflect.FileDescriptor
@@ -174,25 +241,37 @@ var File_proto_product_proto protoreflect.FileDescriptor
 var file_proto_product_proto_rawDesc = string([]byte{
 	0x0a, 0x13, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x2e,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x09, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x70, 0x62,
-	0x22, 0x23, 0x0a, 0x11, 0x47, 0x65, 0x74, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x03, 0x52, 0x02, 0x69, 0x64, 0x22, 0x42, 0x0a, 0x12, 0x47, 0x65, 0x74, 0x50, 0x72, 0x6f, 0x64,
-	0x75, 0x63, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2c, 0x0a, 0x07, 0x70,
-	0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x70,
-	0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x70, 0x62, 0x2e, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74,
-	0x52, 0x07, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x22, 0x43, 0x0a, 0x07, 0x50, 0x72, 0x6f,
-	0x64, 0x75, 0x63, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03,
-	0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x70, 0x72, 0x69, 0x63,
-	0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x05, 0x70, 0x72, 0x69, 0x63, 0x65, 0x32, 0x5b,
-	0x0a, 0x0e, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
-	0x12, 0x49, 0x0a, 0x0a, 0x47, 0x65, 0x74, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x12, 0x1c,
-	0x2e, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x70, 0x62, 0x2e, 0x47, 0x65, 0x74, 0x50, 0x72,
-	0x6f, 0x64, 0x75, 0x63, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1d, 0x2e, 0x70,
-	0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x70, 0x62, 0x2e, 0x47, 0x65, 0x74, 0x50, 0x72, 0x6f, 0x64,
-	0x75, 0x63, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x16, 0x5a, 0x14, 0x2f,
-	0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x70, 0x62, 0x3b, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63,
-	0x74, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x22, 0x48, 0x0a, 0x0c, 0x42, 0x61, 0x73, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04,
+	0x63, 0x6f, 0x64, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6d, 0x73, 0x67, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x22, 0x3f, 0x0a, 0x19, 0x55, 0x70,
+	0x64, 0x61, 0x74, 0x65, 0x53, 0x74, 0x6f, 0x63, 0x6b, 0x57, 0x69, 0x74, 0x68, 0x43, 0x41, 0x53,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x65, 0x74, 0x61, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x04, 0x64, 0x65, 0x74, 0x61, 0x22, 0x49, 0x0a, 0x1a, 0x55,
+	0x70, 0x64, 0x61, 0x74, 0x65, 0x53, 0x74, 0x6f, 0x63, 0x6b, 0x57, 0x69, 0x74, 0x68, 0x43, 0x41,
+	0x53, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2b, 0x0a, 0x04, 0x62, 0x61, 0x73,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63,
+	0x74, 0x70, 0x62, 0x2e, 0x42, 0x61, 0x73, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x52, 0x04, 0x62, 0x61, 0x73, 0x65, 0x2a, 0x7c, 0x0a, 0x0c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x0b, 0x0a, 0x07, 0x53, 0x55, 0x43, 0x43, 0x45, 0x53,
+	0x53, 0x10, 0x00, 0x12, 0x13, 0x0a, 0x0e, 0x49, 0x4e, 0x54, 0x45, 0x52, 0x4e, 0x41, 0x4c, 0x5f,
+	0x45, 0x52, 0x52, 0x4f, 0x52, 0x10, 0xf4, 0x03, 0x12, 0x12, 0x0a, 0x0d, 0x49, 0x4e, 0x56, 0x41,
+	0x4c, 0x49, 0x44, 0x5f, 0x50, 0x41, 0x52, 0x41, 0x4d, 0x10, 0x90, 0x03, 0x12, 0x0e, 0x0a, 0x09,
+	0x4e, 0x4f, 0x54, 0x5f, 0x46, 0x4f, 0x55, 0x4e, 0x44, 0x10, 0x94, 0x03, 0x12, 0x0d, 0x0a, 0x08,
+	0x43, 0x4f, 0x4e, 0x46, 0x4c, 0x49, 0x43, 0x54, 0x10, 0x99, 0x03, 0x12, 0x17, 0x0a, 0x12, 0x49,
+	0x4e, 0x53, 0x55, 0x46, 0x46, 0x49, 0x43, 0x49, 0x45, 0x4e, 0x54, 0x5f, 0x53, 0x54, 0x4f, 0x43,
+	0x4b, 0x10, 0xa1, 0x1f, 0x32, 0x73, 0x0a, 0x0e, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x53,
+	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x61, 0x0a, 0x12, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65,
+	0x53, 0x74, 0x6f, 0x63, 0x6b, 0x57, 0x69, 0x74, 0x68, 0x43, 0x41, 0x53, 0x12, 0x24, 0x2e, 0x70,
+	0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x70, 0x62, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x53,
+	0x74, 0x6f, 0x63, 0x6b, 0x57, 0x69, 0x74, 0x68, 0x43, 0x41, 0x53, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x25, 0x2e, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x70, 0x62, 0x2e, 0x55,
+	0x70, 0x64, 0x61, 0x74, 0x65, 0x53, 0x74, 0x6f, 0x63, 0x6b, 0x57, 0x69, 0x74, 0x68, 0x43, 0x41,
+	0x53, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x16, 0x5a, 0x14, 0x2f, 0x70, 0x72,
+	0x6f, 0x64, 0x75, 0x63, 0x74, 0x70, 0x62, 0x3b, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x70,
+	0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 })
 
 var (
@@ -207,16 +286,18 @@ func file_proto_product_proto_rawDescGZIP() []byte {
 	return file_proto_product_proto_rawDescData
 }
 
+var file_proto_product_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_proto_product_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_proto_product_proto_goTypes = []any{
-	(*GetProductRequest)(nil),  // 0: productpb.GetProductRequest
-	(*GetProductResponse)(nil), // 1: productpb.GetProductResponse
-	(*Product)(nil),            // 2: productpb.Product
+	(ResponseCode)(0),                  // 0: productpb.ResponseCode
+	(*BaseResponse)(nil),               // 1: productpb.BaseResponse
+	(*UpdateStockWithCASRequest)(nil),  // 2: productpb.UpdateStockWithCASRequest
+	(*UpdateStockWithCASResponse)(nil), // 3: productpb.UpdateStockWithCASResponse
 }
 var file_proto_product_proto_depIdxs = []int32{
-	2, // 0: productpb.GetProductResponse.product:type_name -> productpb.Product
-	0, // 1: productpb.ProductService.GetProduct:input_type -> productpb.GetProductRequest
-	1, // 2: productpb.ProductService.GetProduct:output_type -> productpb.GetProductResponse
+	1, // 0: productpb.UpdateStockWithCASResponse.base:type_name -> productpb.BaseResponse
+	2, // 1: productpb.ProductService.UpdateStockWithCAS:input_type -> productpb.UpdateStockWithCASRequest
+	3, // 2: productpb.ProductService.UpdateStockWithCAS:output_type -> productpb.UpdateStockWithCASResponse
 	2, // [2:3] is the sub-list for method output_type
 	1, // [1:2] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -234,13 +315,14 @@ func file_proto_product_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_product_proto_rawDesc), len(file_proto_product_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_proto_product_proto_goTypes,
 		DependencyIndexes: file_proto_product_proto_depIdxs,
+		EnumInfos:         file_proto_product_proto_enumTypes,
 		MessageInfos:      file_proto_product_proto_msgTypes,
 	}.Build()
 	File_proto_product_proto = out.File

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/types"
 	"github.com/golang/mock/gomock"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 // mockgen -source=dao/productDao.go -destination=dao/mocks/productDao_mock.go -package=mocks
@@ -607,6 +609,87 @@ func TestProductServiceImpl_GetProductList(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestProductServiceImpl_UpdateStockWithCAS(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	m := mocks.NewMockProductDao(ctrl)
+	testProductServiceImpl := &ProductServiceImpl{
+		productDao: m,
+	}
+
+	// 测试成功增加库存
+	m.EXPECT().GetProductByID(context.Background(), 1).Return(&model.Product{
+		Model: gorm.Model{
+			ID: 1,
+		},
+		Name:    "Test Product",
+		Stock:   50,
+		Version: 1,
+	}, nil)
+	m.EXPECT().UpdateStockWithCAS(context.Background(), 1, 1, 60).Return(nil)
+
+	err := testProductServiceImpl.UpdateStockWithCAS(context.Background(), 1, 10)
+	if err != nil {
+		t.Errorf("Expected no error when increasing stock, got %v", err)
+	}
+
+	// 测试成功减少库存
+	m.EXPECT().GetProductByID(context.Background(), 2).Return(&model.Product{
+		Model: gorm.Model{
+			ID: 2,
+		},
+		Name:    "Test Product",
+		Stock:   50,
+		Version: 1,
+	}, nil)
+	m.EXPECT().UpdateStockWithCAS(context.Background(), 2, 1, 40).Return(nil)
+
+	err = testProductServiceImpl.UpdateStockWithCAS(context.Background(), 2, -10)
+	if err != nil {
+		t.Errorf("Expected no error when decreasing stock, got %v", err)
+	}
+
+	// 测试库存不足的情况
+	m.EXPECT().GetProductByID(context.Background(), 3).Return(&model.Product{
+		Model: gorm.Model{
+			ID: 3,
+		},
+		Name:    "Test Product",
+		Stock:   5,
+		Version: 1,
+	}, nil)
+
+	err = testProductServiceImpl.UpdateStockWithCAS(context.Background(), 3, -10)
+	if err == nil {
+		t.Error("Expected error when stock is insufficient, got nil")
+	}
+
+	// 测试获取商品信息失败
+	m.EXPECT().GetProductByID(context.Background(), 4).Return(nil, fmt.Errorf("database error"))
+
+	err = testProductServiceImpl.UpdateStockWithCAS(context.Background(), 4, 10)
+	if err == nil {
+		t.Error("Expected error when getting product fails, got nil")
+	}
+
+	// 测试CAS更新失败（版本号不匹配）
+	m.EXPECT().GetProductByID(context.Background(), 5).Return(&model.Product{
+		Model: gorm.Model{
+			ID: 5,
+		},
+		Name:    "Test Product",
+		Stock:   50,
+		Version: 1,
+	}, nil)
+	m.EXPECT().UpdateStockWithCAS(context.Background(), 5, 1, 60).Return(fmt.Errorf("version conflict"))
+
+	err = testProductServiceImpl.UpdateStockWithCAS(context.Background(), 5, 10)
+	if err == nil {
+		t.Error("Expected error when CAS update fails, got nil")
 	}
 }
 
