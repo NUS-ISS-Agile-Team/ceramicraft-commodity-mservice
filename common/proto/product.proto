@@ -41,7 +41,6 @@ message Product {
     int64 price = 3;
     int64 stock = 4;
     int32 status = 5;
-    int64 version = 6;
 }
 
 message GetProductListRequest {
