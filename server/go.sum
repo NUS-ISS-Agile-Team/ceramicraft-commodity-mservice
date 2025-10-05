@@ -4,6 +4,10 @@ github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc
 github.com/KyleBanks/depth v1.2.1/go.mod h1:jzSb9d0L43HxTQfT+oSA1EEp2q+ne2uh6XgeJcm8brE=
 github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/common v0.0.0-20250925130112-b8a0b5fd7347 h1:DTpp7xspWdZHnHGQeGiNXN0sNQ9MPJsaLuIlRPLXgIA=
 github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/common v0.0.0-20250925130112-b8a0b5fd7347/go.mod h1:M6wcVOK64wlV9q8wMYC7EuIck4DyoH/HToxkG7+GY6A=
+github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/common v0.0.0-20251005020253-69240a4a2bb8 h1:9qKU6bY0Y2ZJuf0tvPmtBIzu94Yl0egUHuXlKat4pE8=
+github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/common v0.0.0-20251005020253-69240a4a2bb8/go.mod h1:M6wcVOK64wlV9q8wMYC7EuIck4DyoH/HToxkG7+GY6A=
+github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/common v0.0.0-20251005021808-224dd31507a1 h1:x5KnSN9KwVJbasNOYHUKHuTokVzDKG5qHGnqZeZpv4s=
+github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/common v0.0.0-20251005021808-224dd31507a1/go.mod h1:M6wcVOK64wlV9q8wMYC7EuIck4DyoH/HToxkG7+GY6A=
 github.com/NUS-ISS-Agile-Team/ceramicraft-user-mservice/common v0.0.0-20251002010254-c2e634433342 h1:vaxXJBFvqqJg8UpV0C/TZ5BBlmned4yqvpDNi/QVgv8=
 github.com/NUS-ISS-Agile-Team/ceramicraft-user-mservice/common v0.0.0-20251002010254-c2e634433342/go.mod h1:37OvOYo/KVtH7LdbUnKLitzsC6qE6LCGF6sgaFHzE7E=
 github.com/aws/aws-sdk-go-v2 v1.39.2 h1:EJLg8IdbzgeD7xgvZ+I8M1e0fL0ptn/M47lianzth0I=

@@ -5,7 +5,7 @@ go 1.24.0
 toolchain go1.24.7
 
 require (
-	github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/common v0.0.0-20250925130112-b8a0b5fd7347
+	github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/common v0.0.0-20251005021808-224dd31507a1
 	github.com/NUS-ISS-Agile-Team/ceramicraft-user-mservice/common v0.0.0-20251002010254-c2e634433342
 	github.com/aws/aws-sdk-go-v2 v1.39.2
 	github.com/aws/aws-sdk-go-v2/config v1.31.12
