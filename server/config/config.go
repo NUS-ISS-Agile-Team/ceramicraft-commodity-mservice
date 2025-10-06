@@ -48,9 +48,15 @@ type S3Config struct {
 	Region     string `mapstructure:"region"`
 }
 
+var UseLocalConfig = false
+
 func Init() {
 	workDir, _ := os.Getwd()
-	viper.SetConfigName("config")
+	if UseLocalConfig {
+        viper.SetConfigName("config-local")
+    } else {
+        viper.SetConfigName("config")
+    }
 	viper.SetConfigType("yml")
 	viper.AddConfigPath(workDir + "/resources")
 	viper.AddConfigPath(workDir)
