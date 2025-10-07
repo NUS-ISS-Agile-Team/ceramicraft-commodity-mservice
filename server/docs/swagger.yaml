@@ -8,6 +8,61 @@ definitions:
       err_msg:
         type: string
     type: object
+  data.CartItemBasicVO:
+    properties:
+      id:
+        type: integer
+      product_id:
+        type: integer
+      quantity:
+        minimum: 1
+        type: integer
+      selected:
+        type: boolean
+      user_id:
+        type: integer
+    required:
+    - product_id
+    - quantity
+    type: object
+  data.CartItemDetailVO:
+    properties:
+      id:
+        type: integer
+      product_info:
+        $ref: '#/definitions/types.ProductInfo'
+      quantity:
+        type: integer
+      selected:
+        type: boolean
+      status:
+        description: '1: normal, 2: out of stock'
+        type: integer
+      total_price:
+        type: integer
+    type: object
+  data.CartListVO:
+    properties:
+      cart_items:
+        items:
+          $ref: '#/definitions/data.CartItemDetailVO'
+        type: array
+      selected_item_count:
+        type: integer
+      selected_price:
+        type: integer
+    type: object
+  data.CartPriceEstimateResult:
+    properties:
+      product_price:
+        type: integer
+      shipping_price:
+        type: integer
+      tax:
+        type: integer
+      total:
+        type: integer
+    type: object
   data.ImgUploadRequest:
     properties:
       image_type:
@@ -72,6 +127,205 @@ info:
   title: 商品服务 API
   version: "1.0"
 paths:
+  /customer/cart:
+    get:
+      consumes:
+      - application/json
+      description: Get user's cart info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/data.CartListVO'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: Get user's cart info
+      tags:
+      - Cart
+  /customer/cart/items:
+    post:
+      consumes:
+      - application/json
+      description: Create a cart item
+      parameters:
+      - description: cart item info
+        in: body
+        name: cart_item
+        required: true
+        schema:
+          $ref: '#/definitions/data.CartItemBasicVO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/data.CartItemBasicVO'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: Create a cart item
+      tags:
+      - Cart
+  /customer/cart/items/:item_id:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a cart item
+      parameters:
+      - description: cart item ID
+        in: path
+        name: item_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: Delete a cart item
+      tags:
+      - Cart
+    put:
+      consumes:
+      - application/json
+      description: Update a cart item
+      parameters:
+      - description: cart item info
+        in: body
+        name: cart_item
+        required: true
+        schema:
+          $ref: '#/definitions/data.CartItemBasicVO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/data.CartItemBasicVO'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: Update a cart item
+      tags:
+      - Cart
+  /customer/cart/price-estimate:
+    get:
+      consumes:
+      - application/json
+      description: Calculate order price
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/data.CartPriceEstimateResult'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: Calculate order price
+      tags:
+      - Cart
+  /customer/cart/selected-num:
+    get:
+      consumes:
+      - application/json
+      description: Get number of selected items in cart
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  type: integer
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: Get number of selected items in cart
+      tags:
+      - Cart
   /customer/list:
     get:
       consumes:
