@@ -36,6 +36,6 @@ func clearCartProcess(msg []byte) error {
 		log.Logger.Errorf("Failed to delete user_cart for user ID %d: %v", orderCreatedMessage.UserID, err)
 		return err
 	}
-	log.Logger.Infof("User cart created for user ID %d, order Items %d, %+v", orderCreatedMessage.UserID, orderCreatedMessage.OrderItemList)
+	log.Logger.Infof("User cart created for user ID %d, order Items %+v", orderCreatedMessage.UserID, orderCreatedMessage.OrderItemList)
 	return nil
 }

@@ -15,7 +15,7 @@ type ProductInfo struct {
 	Status           int32  `json:"status"` // 0: 未上架, 1: 已上架
 }
 
-type ProductSimpilfiedInfo struct {
+type ProductSimplifiedInfo struct {
 	ID       int    `json:"id"`
 	Name     string `json:"name"`
 	Category string `json:"category"`

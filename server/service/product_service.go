@@ -202,7 +202,7 @@ func (p *ProductServiceImpl) UpdateProductStock(ctx context.Context, id int, new
 	return nil
 }
 
-func (p *ProductServiceImpl) GetProductList(ctx context.Context, req types.GetProductListQuery) (list []*types.ProductSimpilfiedInfo, count int, err error) {
+func (p *ProductServiceImpl) GetProductList(ctx context.Context, req types.GetProductListQuery) (list []*types.ProductSimplifiedInfo, count int, err error) {
 	listRaw, cnt, err := p.productDao.ListProduct(ctx, dao.ListProductQuery{
 		Keyword:    req.Keyword,
 		Category:   req.Category,
@@ -216,9 +216,9 @@ func (p *ProductServiceImpl) GetProductList(ctx context.Context, req types.GetPr
 		return nil, -1, err
 	}
 
-	list = make([]*types.ProductSimpilfiedInfo, len(listRaw))
+	list = make([]*types.ProductSimplifiedInfo, len(listRaw))
 	for k, listModel := range listRaw {
-		list[k] = &types.ProductSimpilfiedInfo{
+		list[k] = &types.ProductSimplifiedInfo{
 			ID:       int(listModel.ID),
 			Name:     listModel.Name,
 			Category: listModel.Category,
@@ -240,7 +240,7 @@ func (p *ProductServiceImpl) UpdateStockWithCAS(ctx context.Context, id, deta in
 		return err
 	}
 
-	if int(pModel.Stock) + deta < 0 {
+	if int(pModel.Stock)+deta < 0 {
 		log.Logger.Errorf("UpdateStockWithCAS: do not have enough stock, product id: %d, current stock: %d", id, int(pModel.Stock))
 		return fmt.Errorf("do not have enough stock, product id: %d, current stock: %d", id, int(pModel.Stock))
 	}

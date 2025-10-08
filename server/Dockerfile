@@ -1,5 +1,5 @@
 # Use the official Go image with version 1.24
-FROM golang:1.24.0
+FROM golang:1.24.0-alpine AS builder 
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY . .
 RUN go build -ldflags="-s -w" -o main main.go
 
 # Create a non-root user and set permissions
-RUN useradd -m appuser && \
+RUN adduser -D -h /home/appuser appuser && \
     mkdir -p logs && \
     chown -R appuser:appuser config/ && \
     chown -R appuser:appuser logs/ && \

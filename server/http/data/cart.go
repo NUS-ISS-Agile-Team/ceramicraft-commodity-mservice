@@ -17,7 +17,7 @@ const (
 
 type CartItemDetailVO struct {
 	ID          int                         `json:"id"`
-	ProductInfo types.ProductSimpilfiedInfo `json:"product_info"`
+	ProductInfo types.ProductSimplifiedInfo `json:"product_info"`
 	Quantity    int                         `json:"quantity"`
 	TotalPrice  int                         `json:"total_price"`
 	Status      int                         `json:"status"` // 1: normal, 2: out of stock

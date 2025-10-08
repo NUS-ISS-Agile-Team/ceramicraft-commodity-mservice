@@ -178,7 +178,7 @@ func (c *CartServiceImpl) GetCartItems(ctx context.Context, userId int) (*data.C
 func buildCartItemDetail(product *model.Product, item *model.ShoppingCartItem) data.CartItemDetailVO {
 	ret := data.CartItemDetailVO{
 		ID: item.ID,
-		ProductInfo: types.ProductSimpilfiedInfo{
+		ProductInfo: types.ProductSimplifiedInfo{
 			ID:       int(product.ID),
 			Name:     product.Name,
 			Category: product.Category,
