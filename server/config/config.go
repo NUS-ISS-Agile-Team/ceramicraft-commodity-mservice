@@ -11,11 +11,19 @@ var (
 )
 
 type Conf struct {
-	GrpcConfig  *GrpcConfig `mapstructure:"grpc"`
-	LogConfig   *LogConfig  `mapstructure:"log"`
-	HttpConfig  *HttpConfig `mapstructure:"http"`
-	MySQLConfig *MySQL      `mapstructure:"mysql"`
-	S3Config    *S3Config   `mapstructure:"s3Config"`
+	GrpcConfig  *GrpcConfig          `mapstructure:"grpc"`
+	LogConfig   *LogConfig           `mapstructure:"log"`
+	HttpConfig  *HttpConfig          `mapstructure:"http"`
+	MySQLConfig *MySQL               `mapstructure:"mysql"`
+	S3Config    *S3Config            `mapstructure:"s3Config"`
+	KafkaConfig *KafkaConsumerConfig `mapstructure:"kafka"`
+}
+
+type KafkaConsumerConfig struct {
+	Brokers        []string `mapstructure:"brokers"`
+	GroupID        string   `mapstructure:"group_id"`
+	MaxBytes       int      `mapstructure:"max_bytes"`
+	CommitInterval int      `mapstructure:"commit_interval"`
 }
 
 type HttpConfig struct {
@@ -53,10 +61,10 @@ var UseLocalConfig = false
 func Init() {
 	workDir, _ := os.Getwd()
 	if UseLocalConfig {
-        viper.SetConfigName("config-local")
-    } else {
-        viper.SetConfigName("config")
-    }
+		viper.SetConfigName("config-local")
+	} else {
+		viper.SetConfigName("config")
+	}
 	viper.SetConfigType("yml")
 	viper.AddConfigPath(workDir + "/resources")
 	viper.AddConfigPath(workDir)

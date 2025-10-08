@@ -9,6 +9,7 @@ import (
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/grpc"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/http"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/log"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/mq"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/repository"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-user-mservice/common/utils"
 )
@@ -24,6 +25,7 @@ func main() {
 	log.InitLogger()
 	repository.Init()
 	utils.InitJwtSecret()
+	mq.Init()
 	go grpc.Init(sigCh)
 	go http.Init(sigCh)
 	// listen terminage signal

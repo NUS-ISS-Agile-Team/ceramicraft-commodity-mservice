@@ -300,12 +300,12 @@ func (c *CartServiceImpl) EstimatePrice(ctx context.Context, userId int) (*data.
 }
 
 const (
-	freeShipPrice = 100
-	shipPrice     = 5
+	freeShipPrice = 300
+	shipPrice     = 8
 )
 
 func getTaxPrice(productPrice int) int {
-	return int(float64(productPrice) * 0.09)
+	return productPrice * 9 / 100
 }
 
 func getShipmentPrice(productPrice int) int {
