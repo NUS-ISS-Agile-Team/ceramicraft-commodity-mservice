@@ -16,6 +16,7 @@ type ProductDao interface {
 	CreateProduct(ctx context.Context, product *model.Product) (productId int, err error)
 	UpdateStockWithCAS(ctx context.Context, id int, version int, newStock int) error
 	GetProductByID(ctx context.Context, id int) (*model.Product, error)
+	GetProductByIDs(ctx context.Context, ids []int) ([]*model.Product, error)
 	UpdateProductStatus(ctx context.Context, id int, status int) error
 	UpdateProductStock(ctx context.Context, id int, stock int) error
 	ListProduct(ctx context.Context, q ListProductQuery) ([]*model.Product, int, error)
@@ -49,7 +50,7 @@ func (p *ProductDaoImpl) CreateProduct(ctx context.Context, product *model.Produ
 	return int(product.ID), nil
 }
 
-// UpdateStockWithCAS 
+// UpdateStockWithCAS
 func (p *ProductDaoImpl) UpdateStockWithCAS(ctx context.Context, id, version, newStock int) error {
 	ret := p.db.WithContext(ctx).Model(&model.Product{}).Where("id = ? AND version = ?", id, version).Update("stock", newStock)
 	if ret.Error != nil {
@@ -68,6 +69,16 @@ func (p *ProductDaoImpl) GetProductByID(ctx context.Context, id int) (*model.Pro
 		return nil, result.Error
 	}
 	return &product, nil
+}
+
+func (p *ProductDaoImpl) GetProductByIDs(ctx context.Context, ids []int) ([]*model.Product, error) {
+	var products []*model.Product
+	result := p.db.WithContext(ctx).Where("id IN ?", ids).Find(&products)
+	if result.Error != nil {
+		log.Logger.Errorf("Failed to get products by IDs %v: %v", ids, result.Error)
+		return nil, result.Error
+	}
+	return products, nil
 }
 
 // UpdateProductStock 更新商品库存

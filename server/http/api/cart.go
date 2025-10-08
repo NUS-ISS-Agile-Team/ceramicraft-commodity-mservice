@@ -6,6 +6,7 @@ import (
 
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/http/data"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/log"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -35,14 +36,19 @@ func CreateCartItem(c *gin.Context) {
 		return
 	}
 	req.UserID = userID.(int)
-
-	// ret, err := service.GetCartService().CreateCartItem(c.Request.Context(), req)
-	// if err != nil {
-	// 	log.Logger.Errorf("CreateCartItem: Failed to create cart item: %v", err)
-	// 	c.JSON(http.StatusInternalServerError, data.ResponseFailed("Failed to create cart item"))
-	// 	return
-	// }
-	c.JSON(http.StatusOK, data.ResponseSuccess(req))
+	req.Selected = true
+	bizErr := service.GetCartService().AddItem(c.Request.Context(), &req)
+	if bizErr == nil {
+		c.JSON(http.StatusOK, data.ResponseSuccess(req))
+		return
+	}
+	if bizErr.Code == service.ProductCheckStatus_DBError {
+		log.Logger.Errorf("CreateCartItem: Failed to add cart item: %v", bizErr)
+		c.JSON(http.StatusInternalServerError, data.ResponseFailed("Failed to add cart item"))
+		return
+	}
+	log.Logger.Errorf("CreateCartItem: Failed to add cart item: %v", bizErr)
+	c.JSON(http.StatusBadRequest, data.ResponseFailed(bizErr.Message))
 }
 
 // UpdateCartItem godoc
@@ -79,13 +85,23 @@ func UpdateCartItem(c *gin.Context) {
 		return
 	}
 	req.ID = id
-	// ret, err := service.GetCartService().UpdateCartItem(c.Request.Context(), req)
-	// if err != nil {
-	// 	log.Logger.Errorf("UpdateCartItem: Failed to update cart item: %v", err)
-	// 	c.JSON(http.StatusInternalServerError, data.ResponseFailed("Failed to update cart item"))
-	// 	return
-	// }
-	c.JSON(http.StatusOK, data.ResponseSuccess(req))
+	if req.ID <= 0 {
+		log.Logger.Errorf("UpdateCartItem: item_id must be positive")
+		c.JSON(http.StatusBadRequest, data.ResponseFailed("illegal item_id parameter"))
+		return
+	}
+	bizErr := service.GetCartService().UpdateItem(c.Request.Context(), &req)
+	if bizErr == nil {
+		c.JSON(http.StatusOK, data.ResponseSuccess(req))
+		return
+	}
+	if bizErr.Code == service.ProductCheckStatus_DBError {
+		log.Logger.Errorf("UpdateCartItem: Failed to update cart item: %v", bizErr)
+		c.JSON(http.StatusInternalServerError, data.ResponseFailed("Failed to update cart item"))
+		return
+	}
+	log.Logger.Errorf("UpdateCartItem: Failed to update cart item: %v", bizErr)
+	c.JSON(http.StatusBadRequest, data.ResponseFailed(bizErr.Message))
 }
 
 // DeleteCartItem godoc
@@ -119,8 +135,13 @@ func DeleteCartItem(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, data.ResponseFailed("User not authenticated"))
 		return
 	}
-	_ = userID.(int)
-
+	userId := userID.(int)
+	err = service.GetCartService().DeleteItem(c.Request.Context(), id, userId)
+	if err != nil {
+		log.Logger.Errorf("DeleteCartItem: Failed to delete cart item: %v", err)
+		c.JSON(http.StatusInternalServerError, data.ResponseFailed("Failed to delete cart item"))
+		return
+	}
 	// todo delete with itemId+userId
 	c.JSON(http.StatusOK, data.ResponseSuccess(nil))
 }
@@ -144,12 +165,13 @@ func GetUserCartInfo(c *gin.Context) {
 	}
 	userID = userID.(int)
 	log.Logger.Infof("GetUserCartInfo: userID=%d", userID)
-	// todo get cart item list with userId
-	c.JSON(http.StatusOK, data.ResponseSuccess(&data.CartListVO{
-		CartItems:         []data.CartItemDetailVO{},
-		SelectedItemCount: 0,
-		SelectedPrice:     0,
-	}))
+	ret, err := service.GetCartService().GetCartItems(c.Request.Context(), userID.(int))
+	if err != nil {
+		log.Logger.Errorf("GetUserCartInfo: Failed to get cart items: %v", err)
+		c.JSON(http.StatusInternalServerError, data.ResponseFailed("Failed to get cart items"))
+		return
+	}
+	c.JSON(http.StatusOK, data.ResponseSuccess(ret))
 }
 
 // GetCartSelctedNum godoc
@@ -171,8 +193,13 @@ func GetCartSelctedNum(c *gin.Context) {
 	}
 	userId := userID.(int)
 	log.Logger.Infof("GetCartSelctedNum: userID=%d", userId)
-	// todo get cart selected num with userId
-	c.JSON(http.StatusOK, data.ResponseSuccess(0))
+	ret, err := service.GetCartService().GetCartSelectedItemCnt(c.Request.Context(), userId)
+	if err != nil {
+		log.Logger.Errorf("GetCartSelctedNum: Failed to get selected item count: %v", err)
+		c.JSON(http.StatusInternalServerError, data.ResponseFailed("Failed to get selected item count"))
+		return
+	}
+	c.JSON(http.StatusOK, data.ResponseSuccess(ret))
 }
 
 // CartPriceEstimate godoc
@@ -193,5 +220,11 @@ func GetEstimatePrice(c *gin.Context) {
 	}
 	userIdInt := userId.(int)
 	log.Logger.Infof("CalOrderPrice: userID=%d", userIdInt)
-	c.JSON(http.StatusOK, data.ResponseSuccess(&data.CartPriceEstimateResult{}))
+	ret, err := service.GetCartService().EstimatePrice(c.Request.Context(), userIdInt)
+	if err != nil {
+		log.Logger.Errorf("CalOrderPrice: Failed to estimate price: %v", err)
+		c.JSON(http.StatusInternalServerError, data.ResponseFailed("Failed to estimate price"))
+		return
+	}
+	c.JSON(http.StatusOK, data.ResponseSuccess(ret))
 }

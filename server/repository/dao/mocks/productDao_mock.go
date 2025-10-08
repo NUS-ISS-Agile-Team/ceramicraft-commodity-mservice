@@ -66,6 +66,21 @@ func (mr *MockProductDaoMockRecorder) GetProductByID(ctx, id interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProductByID", reflect.TypeOf((*MockProductDao)(nil).GetProductByID), ctx, id)
 }
 
+// GetProductByIDs mocks base method.
+func (m *MockProductDao) GetProductByIDs(ctx context.Context, ids []int) ([]*model.Product, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetProductByIDs", ctx, ids)
+	ret0, _ := ret[0].([]*model.Product)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProductByIDs indicates an expected call of GetProductByIDs.
+func (mr *MockProductDaoMockRecorder) GetProductByIDs(ctx, ids interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProductByIDs", reflect.TypeOf((*MockProductDao)(nil).GetProductByIDs), ctx, ids)
+}
+
 // ListProduct mocks base method.
 func (m *MockProductDao) ListProduct(ctx context.Context, q dao.ListProductQuery) ([]*model.Product, int, error) {
 	m.ctrl.T.Helper()
