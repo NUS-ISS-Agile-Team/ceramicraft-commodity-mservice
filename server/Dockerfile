@@ -14,7 +14,9 @@ RUN go mod tidy
 COPY . .
 
 # Build the Go application
-RUN go build -ldflags="-s -w" -o main main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+    go build -ldflags="-w -s" -o main main.go && \
+    go clean -cache -modcache
 
 # Create a non-root user and set permissions
 RUN adduser -D -h /home/appuser appuser && \
