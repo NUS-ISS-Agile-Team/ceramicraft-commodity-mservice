@@ -106,6 +106,10 @@ func (c *CartServiceImpl) DeleteItem(ctx context.Context, itemId int, userId int
 
 // DeleteItemByProductIds implements CartService.
 func (c *CartServiceImpl) DeleteItemByProductIds(ctx context.Context, userId int, productIds []int) error {
+	if len(productIds) == 0 {
+		log.Logger.Warnf("CartService: DeleteItemByProductIds: No product IDs provided for deletion")
+		return nil
+	}
 	err := c.cartItemDao.DeleteByProductIds(ctx, userId, productIds)
 	if err != nil {
 		log.Logger.Errorf("CartService: DeleteItemByProductIds: Failed to delete cart items: %v", err)
@@ -159,7 +163,7 @@ func (c *CartServiceImpl) GetCartItems(ctx context.Context, userId int) (*data.C
 			}
 		}
 	}
-	if len(productId2Item) > 0 {
+	if len(toDeleteProductIds) > 0 {
 		go func() {
 			err := c.cartItemDao.DeleteByProductIds(context.Background(), userId, toDeleteProductIds)
 			log.Logger.Infof("CartService: GetCartItems: Deleted cart items with invalid products for user ID %d, err: %v", userId, err)
