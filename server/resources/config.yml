@@ -21,3 +21,9 @@ mysql:
 s3Config:
   bucket_name: "ceramicraft"
   region: "ap-southeast-1"
+
+kafka:
+  brokers: ["kafka-container:9092"]
+  group_id: "ceramicraft-product-group"
+  max_bytes: 10485760
+  commit_interval: 0

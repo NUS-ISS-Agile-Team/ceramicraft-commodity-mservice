@@ -19,14 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ProductService_GetProduct_FullMethodName = "/productpb.ProductService/GetProduct"
+	ProductService_UpdateStockWithCAS_FullMethodName = "/productpb.ProductService/UpdateStockWithCAS"
+	ProductService_GetProductList_FullMethodName     = "/productpb.ProductService/GetProductList"
 )
 
 // ProductServiceClient is the client API for ProductService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProductServiceClient interface {
-	GetProduct(ctx context.Context, in *GetProductRequest, opts ...grpc.CallOption) (*GetProductResponse, error)
+	UpdateStockWithCAS(ctx context.Context, in *UpdateStockWithCASRequest, opts ...grpc.CallOption) (*UpdateStockWithCASResponse, error)
+	GetProductList(ctx context.Context, in *GetProductListRequest, opts ...grpc.CallOption) (*GetProductListResponse, error)
 }
 
 type productServiceClient struct {
@@ -37,10 +39,20 @@ func NewProductServiceClient(cc grpc.ClientConnInterface) ProductServiceClient {
 	return &productServiceClient{cc}
 }
 
-func (c *productServiceClient) GetProduct(ctx context.Context, in *GetProductRequest, opts ...grpc.CallOption) (*GetProductResponse, error) {
+func (c *productServiceClient) UpdateStockWithCAS(ctx context.Context, in *UpdateStockWithCASRequest, opts ...grpc.CallOption) (*UpdateStockWithCASResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetProductResponse)
-	err := c.cc.Invoke(ctx, ProductService_GetProduct_FullMethodName, in, out, cOpts...)
+	out := new(UpdateStockWithCASResponse)
+	err := c.cc.Invoke(ctx, ProductService_UpdateStockWithCAS_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productServiceClient) GetProductList(ctx context.Context, in *GetProductListRequest, opts ...grpc.CallOption) (*GetProductListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetProductListResponse)
+	err := c.cc.Invoke(ctx, ProductService_GetProductList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +63,8 @@ func (c *productServiceClient) GetProduct(ctx context.Context, in *GetProductReq
 // All implementations must embed UnimplementedProductServiceServer
 // for forward compatibility.
 type ProductServiceServer interface {
-	GetProduct(context.Context, *GetProductRequest) (*GetProductResponse, error)
+	UpdateStockWithCAS(context.Context, *UpdateStockWithCASRequest) (*UpdateStockWithCASResponse, error)
+	GetProductList(context.Context, *GetProductListRequest) (*GetProductListResponse, error)
 	mustEmbedUnimplementedProductServiceServer()
 }
 
@@ -62,8 +75,11 @@ type ProductServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedProductServiceServer struct{}
 
-func (UnimplementedProductServiceServer) GetProduct(context.Context, *GetProductRequest) (*GetProductResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetProduct not implemented")
+func (UnimplementedProductServiceServer) UpdateStockWithCAS(context.Context, *UpdateStockWithCASRequest) (*UpdateStockWithCASResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateStockWithCAS not implemented")
+}
+func (UnimplementedProductServiceServer) GetProductList(context.Context, *GetProductListRequest) (*GetProductListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProductList not implemented")
 }
 func (UnimplementedProductServiceServer) mustEmbedUnimplementedProductServiceServer() {}
 func (UnimplementedProductServiceServer) testEmbeddedByValue()                        {}
@@ -86,20 +102,38 @@ func RegisterProductServiceServer(s grpc.ServiceRegistrar, srv ProductServiceSer
 	s.RegisterService(&ProductService_ServiceDesc, srv)
 }
 
-func _ProductService_GetProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetProductRequest)
+func _ProductService_UpdateStockWithCAS_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateStockWithCASRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProductServiceServer).GetProduct(ctx, in)
+		return srv.(ProductServiceServer).UpdateStockWithCAS(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ProductService_GetProduct_FullMethodName,
+		FullMethod: ProductService_UpdateStockWithCAS_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProductServiceServer).GetProduct(ctx, req.(*GetProductRequest))
+		return srv.(ProductServiceServer).UpdateStockWithCAS(ctx, req.(*UpdateStockWithCASRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProductService_GetProductList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProductListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).GetProductList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProductService_GetProductList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).GetProductList(ctx, req.(*GetProductListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -112,8 +146,12 @@ var ProductService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ProductServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetProduct",
-			Handler:    _ProductService_GetProduct_Handler,
+			MethodName: "UpdateStockWithCAS",
+			Handler:    _ProductService_UpdateStockWithCAS_Handler,
+		},
+		{
+			MethodName: "GetProductList",
+			Handler:    _ProductService_GetProductList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

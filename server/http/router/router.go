@@ -48,6 +48,12 @@ func NewRouter() *gin.Engine {
 			authed := customerRouter.Group("")
 			{
 				authed.Use(middleware.AuthMiddleware())
+				authed.GET("/cart", api.GetUserCartInfo)
+				authed.POST("/cart/items", api.CreateCartItem)
+				authed.PUT("/cart/items/:item_id", api.UpdateCartItem)
+				authed.DELETE("/cart/items/:item_id", api.DeleteCartItem)
+				authed.GET("/cart/selected-num", api.GetCartSelctedNum)
+				authed.GET("/cart/price-estimate", api.GetEstimatePrice)
 			}
 		}
 	}

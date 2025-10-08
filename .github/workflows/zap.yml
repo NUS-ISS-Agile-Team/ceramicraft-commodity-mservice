@@ -21,7 +21,7 @@ jobs:
             - name: Build and run Docker Compose
               run: |
                 JWT_SECRET=${{ secrets.JWT_SECRET }} MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} docker compose -f .github/ci/docker-compose.yml up --build -d
-                timeout 180 bash -c 'until [ "$(docker compose -f .github/ci/docker-compose.yml ps ceramicraft-commodity-mservice --format json | jq -r .Health)" = "healthy" ]; do sleep 2; done'
+                timeout 180 bash -c 'until curl -f http://localhost:8080/product-ms/v1/ping;  do sleep 2; done'
             - name: Check Docker Compose Logs
               if: failure()
               run: |
