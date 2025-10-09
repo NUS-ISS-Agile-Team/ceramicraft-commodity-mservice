@@ -301,6 +301,36 @@ func GetMerchantProductList(c *gin.Context) {
 	}))
 }
 
+// EditProductInfo godoc
+// @Summary 编辑商品信息
+// @Description 根据商品ID更新商品详细信息
+// @Tags 商品
+// @Accept json
+// @Produce json
+// @Param request body types.UpdateProductInfoRequest true "编辑商品请求"
+// @Success 200 {object} data.BaseResponse "编辑成功"
+// @Failure 400 {object} data.BaseResponse "请求参数错误"
+// @Failure 404 {object} data.BaseResponse "商品不存在"
+// @Failure 500 {object} data.BaseResponse "服务器内部错误"
+// @Router /merchant/edit [post]
+func EditProductInfo(c *gin.Context) {
+	var req types.UpdateProductInfoRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Logger.Errorf("EditProductInfo: Invalid request body: %v", err)
+		c.JSON(http.StatusBadRequest, data.ResponseFailed(err.Error()))
+		return
+	}
+
+	// 调用 service 层更新商品信息
+	err := service.GetProductServiceInstance().UpdateProductInfo(c.Request.Context(), &req)
+	if err != nil {
+		log.Logger.Errorf("EditProductInfo: Failed to update product info: %v", err)
+		c.JSON(http.StatusInternalServerError, data.ResponseFailed("Failed to update product info"))
+		return
+	}
+
+	c.JSON(http.StatusOK, data.ResponseSuccess(nil))
+}
 
 // GetProductCustomer godoc
 // @Summary 获取商品详情(用户侧)

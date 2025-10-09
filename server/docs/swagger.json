@@ -500,6 +500,58 @@
                 }
             }
         },
+        "/merchant/edit": {
+            "post": {
+                "description": "根据商品ID更新商品详细信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商品"
+                ],
+                "summary": "编辑商品信息",
+                "parameters": [
+                    {
+                        "description": "编辑商品请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateProductInfoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "编辑成功",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "商品不存在",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/merchant/images/upload-urls": {
             "post": {
                 "description": "Get presigned URL for image upload",
@@ -853,7 +905,7 @@
                     "type": "integer"
                 },
                 "product_info": {
-                    "$ref": "#/definitions/types.ProductInfo"
+                    "$ref": "#/definitions/types.ProductSimplifiedInfo"
                 },
                 "quantity": {
                     "type": "integer"
@@ -966,6 +1018,74 @@
                     "type": "integer"
                 },
                 "stock": {
+                    "type": "integer"
+                },
+                "weight": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.ProductSimplifiedInfo": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "pic_info": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "0: 未上架, 1: 已上架",
+                    "type": "integer"
+                },
+                "stock": {
+                    "type": "integer"
+                }
+            }
+        },
+        "types.UpdateProductInfoRequest": {
+            "type": "object",
+            "properties": {
+                "capacity": {
+                    "type": "string"
+                },
+                "care_instructions": {
+                    "type": "string"
+                },
+                "category": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "dimensions": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "material": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "pic_info": {
+                    "type": "string"
+                },
+                "price": {
                     "type": "integer"
                 },
                 "weight": {

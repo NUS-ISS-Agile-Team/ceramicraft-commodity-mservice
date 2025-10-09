@@ -14,6 +14,7 @@ import (
 
 type ProductDao interface {
 	CreateProduct(ctx context.Context, product *model.Product) (productId int, err error)
+	UpdateProduct(ctx context.Context, product *model.Product) error
 	UpdateStockWithCAS(ctx context.Context, id int, version int, newStock int) error
 	GetProductByID(ctx context.Context, id int) (*model.Product, error)
 	GetProductByIDs(ctx context.Context, ids []int) ([]*model.Product, error)
@@ -48,6 +49,21 @@ func (p *ProductDaoImpl) CreateProduct(ctx context.Context, product *model.Produ
 		return 0, result.Error
 	}
 	return int(product.ID), nil
+}
+
+// UpdateProduct 更新产品信息
+func (p *ProductDaoImpl) UpdateProduct(ctx context.Context, product *model.Product) error {
+	result := p.db.WithContext(ctx).Model(&model.Product{}).Where("id = ?", product.ID).Updates(product)
+	if result.Error != nil {
+		log.Logger.Errorf("Failed to update product ID %d: %v", product.ID, result.Error)
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		err := fmt.Errorf("product not found with ID: %d", product.ID)
+		log.Logger.Error(err)
+		return err
+	}
+	return nil
 }
 
 // UpdateStockWithCAS

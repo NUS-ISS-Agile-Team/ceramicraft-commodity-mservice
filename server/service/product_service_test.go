@@ -693,6 +693,163 @@ func TestProductServiceImpl_UpdateStockWithCAS(t *testing.T) {
 	}
 }
 
+func TestProductServiceImpl_UpdateProductInfo(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	m := mocks.NewMockProductDao(ctrl)
+	testProductServiceImpl := &ProductServiceImpl{
+		productDao: m,
+	}
+
+	// 测试成功更新商品信息
+	existingProduct := &model.Product{
+		Model: gorm.Model{
+			ID: 1,
+		},
+		Name:             "Old Product Name",
+		Category:         "Old Category",
+		Price:            100,
+		Desc:             "Old Description",
+		Stock:            50,
+		Status:           0, // 未上架
+		PicInfo:          "old_pic.jpg",
+		Dimensions:       "10x10x10",
+		Material:         "Old Material",
+		Weight:           "1kg",
+		Capacity:         "500ml",
+		CareInstructions: "Old instructions",
+		Version:          1,
+	}
+
+	updateRequest := &types.UpdateProductInfoRequest{
+		ID:               1,
+		Name:             "Updated Product Name",
+		Category:         "Updated Category",
+		Price:            200,
+		Desc:             "Updated Description",
+		PicInfo:          "updated_pic.jpg",
+		Dimensions:       "20x20x20",
+		Material:         "Updated Material",
+		Weight:           "2kg",
+		Capacity:         "1L",
+		CareInstructions: "Updated instructions",
+	}
+
+	expectedUpdatedProduct := &model.Product{
+		Model:            existingProduct.Model,
+		Name:             updateRequest.Name,
+		Category:         updateRequest.Category,
+		Price:            updateRequest.Price,
+		Desc:             updateRequest.Desc,
+		Stock:            existingProduct.Stock, // 保持原有库存
+		PicInfo:          updateRequest.PicInfo,
+		Dimensions:       updateRequest.Dimensions,
+		Material:         updateRequest.Material,
+		Weight:           updateRequest.Weight,
+		Capacity:         updateRequest.Capacity,
+		CareInstructions: updateRequest.CareInstructions,
+		Status:           existingProduct.Status,  // 保持原有状态
+		Version:          existingProduct.Version, // 保持原有版本
+	}
+
+	m.EXPECT().GetProductByID(context.Background(), 1).Return(existingProduct, nil)
+	m.EXPECT().UpdateProduct(context.Background(), expectedUpdatedProduct).Return(nil)
+
+	err := testProductServiceImpl.UpdateProductInfo(context.Background(), updateRequest)
+	if err != nil {
+		t.Errorf("Expected no error when updating product info, got %v", err)
+	}
+
+	// 测试商品不存在的情况
+	m.EXPECT().GetProductByID(context.Background(), 2).Return(nil, errors.New("product not found"))
+
+	updateRequest2 := &types.UpdateProductInfoRequest{
+		ID:   2,
+		Name: "Test Product",
+	}
+
+	err = testProductServiceImpl.UpdateProductInfo(context.Background(), updateRequest2)
+	if err == nil {
+		t.Error("Expected error when product not found, got nil")
+	}
+
+	// 测试商品为nil的情况
+	m.EXPECT().GetProductByID(context.Background(), 3).Return(nil, nil)
+
+	updateRequest3 := &types.UpdateProductInfoRequest{
+		ID:   3,
+		Name: "Test Product",
+	}
+
+	err = testProductServiceImpl.UpdateProductInfo(context.Background(), updateRequest3)
+	if err == nil {
+		t.Error("Expected error when product is nil, got nil")
+	}
+
+	// 测试尝试更新已上架商品的情况
+	publishedProduct := &model.Product{
+		Model: gorm.Model{
+			ID: 4,
+		},
+		Name:   "Published Product",
+		Status: 1, // 已上架
+	}
+
+	m.EXPECT().GetProductByID(context.Background(), 4).Return(publishedProduct, nil)
+
+	updateRequest4 := &types.UpdateProductInfoRequest{
+		ID:   4,
+		Name: "Updated Name",
+	}
+
+	err = testProductServiceImpl.UpdateProductInfo(context.Background(), updateRequest4)
+	if err == nil {
+		t.Error("Expected error when updating published product, got nil")
+	}
+
+	// 测试DAO更新失败的情况
+	unpublishedProduct := &model.Product{
+		Model: gorm.Model{
+			ID: 5,
+		},
+		Name:    "Unpublished Product",
+		Status:  0, // 未上架
+		Stock:   30,
+		Version: 2,
+	}
+
+	updateRequest5 := &types.UpdateProductInfoRequest{
+		ID:   5,
+		Name: "Updated Name",
+	}
+
+	expectedUpdatedProduct5 := &model.Product{
+		Model:            unpublishedProduct.Model,
+		Name:             updateRequest5.Name,
+		Category:         updateRequest5.Category,
+		Price:            updateRequest5.Price,
+		Desc:             updateRequest5.Desc,
+		Stock:            unpublishedProduct.Stock,
+		PicInfo:          updateRequest5.PicInfo,
+		Dimensions:       updateRequest5.Dimensions,
+		Material:         updateRequest5.Material,
+		Weight:           updateRequest5.Weight,
+		Capacity:         updateRequest5.Capacity,
+		CareInstructions: updateRequest5.CareInstructions,
+		Status:           unpublishedProduct.Status,
+		Version:          unpublishedProduct.Version,
+	}
+
+	m.EXPECT().GetProductByID(context.Background(), 5).Return(unpublishedProduct, nil)
+	m.EXPECT().UpdateProduct(context.Background(), expectedUpdatedProduct5).Return(errors.New("database error"))
+
+	err = testProductServiceImpl.UpdateProductInfo(context.Background(), updateRequest5)
+	if err == nil {
+		t.Error("Expected error when DAO update fails, got nil")
+	}
+}
+
 func TestProductServiceImpl_UpdateProductStock(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()

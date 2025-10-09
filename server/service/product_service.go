@@ -21,6 +21,7 @@ type ProductService interface {
 	GetProductList(ctx context.Context, req types.GetProductListQuery) (list []*types.ProductInfo, count int, err error)
 
 	UpdateStockWithCAS(ctx context.Context, id int, deta int) error
+	UpdateProductInfo(ctx context.Context, req *types.UpdateProductInfoRequest) error
 }
 
 type ProductServiceImpl struct {
@@ -240,7 +241,7 @@ func (p *ProductServiceImpl) UpdateStockWithCAS(ctx context.Context, id, deta in
 		return err
 	}
 
-	if int(pModel.Stock)+deta < 0 {
+	if int(pModel.Stock) + deta < 0 {
 		log.Logger.Errorf("UpdateStockWithCAS: do not have enough stock, product id: %d, current stock: %d", id, int(pModel.Stock))
 		return fmt.Errorf("do not have enough stock, product id: %d, current stock: %d", id, int(pModel.Stock))
 	}
@@ -249,6 +250,54 @@ func (p *ProductServiceImpl) UpdateStockWithCAS(ctx context.Context, id, deta in
 	err = p.productDao.UpdateStockWithCAS(ctx, id, int(pModel.Version), newStock)
 	if err != nil {
 		log.Logger.Errorf("UpdateStockWithCAS: update failed, err:%s", err.Error())
+		return err
+	}
+
+	return nil
+}
+
+// UpdateProductInfo 更新商品信息
+// 要求：
+// 1. 商品必须存在
+// 2. 商品必须处于下架状态
+func (p *ProductServiceImpl) UpdateProductInfo(ctx context.Context, req *types.UpdateProductInfoRequest) error {
+	// 获取商品信息
+	product, err := p.productDao.GetProductByID(ctx, req.ID)
+	if err != nil {
+		log.Logger.Errorf("UpdateProductInfo: Failed to get product by ID: %v", err)
+		return err
+	}
+	if product == nil {
+		return fmt.Errorf("product not found with ID: %d", req.ID)
+	}
+
+	// 检查商品状态
+	if product.Status != ProductStatusUnpublished {
+		return fmt.Errorf("cannot update product info for published product (ID: %d)", req.ID)
+	}
+
+	// 构建更新的商品模型
+	updatedProduct := &model.Product{
+		Model:            product.Model, // 保持原有的ID、创建时间等
+		Name:             req.Name,
+		Category:         req.Category,
+		Price:            req.Price,
+		Desc:             req.Desc,
+		Stock:            product.Stock, // 保持原有库存
+		PicInfo:          req.PicInfo,
+		Dimensions:       req.Dimensions,
+		Material:         req.Material,
+		Weight:           req.Weight,
+		Capacity:         req.Capacity,
+		CareInstructions: req.CareInstructions,
+		Status:           product.Status, // 保持原有状态
+		Version:          product.Version, // 保持原有版本
+	}
+
+	// 调用DAO层更新商品信息
+	err = p.productDao.UpdateProduct(ctx, updatedProduct)
+	if err != nil {
+		log.Logger.Errorf("UpdateProductInfo: Failed to update product: %v", err)
 		return err
 	}
 
