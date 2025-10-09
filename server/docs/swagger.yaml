@@ -30,7 +30,7 @@ definitions:
       id:
         type: integer
       product_info:
-        $ref: '#/definitions/types.ProductInfo'
+        $ref: '#/definitions/types.ProductSimplifiedInfo'
       quantity:
         type: integer
       selected:
@@ -105,6 +105,51 @@ definitions:
         description: '0: 未上架, 1: 已上架'
         type: integer
       stock:
+        type: integer
+      weight:
+        type: string
+    type: object
+  types.ProductSimplifiedInfo:
+    properties:
+      category:
+        type: string
+      desc:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      pic_info:
+        type: string
+      price:
+        type: integer
+      status:
+        description: '0: 未上架, 1: 已上架'
+        type: integer
+      stock:
+        type: integer
+    type: object
+  types.UpdateProductInfoRequest:
+    properties:
+      capacity:
+        type: string
+      care_instructions:
+        type: string
+      category:
+        type: string
+      desc:
+        type: string
+      dimensions:
+        type: string
+      id:
+        type: integer
+      material:
+        type: string
+      name:
+        type: string
+      pic_info:
+        type: string
+      price:
         type: integer
       weight:
         type: string
@@ -428,6 +473,40 @@ paths:
           schema:
             $ref: '#/definitions/data.BaseResponse'
       summary: 添加商品
+      tags:
+      - 商品
+  /merchant/edit:
+    post:
+      consumes:
+      - application/json
+      description: 根据商品ID更新商品详细信息
+      parameters:
+      - description: 编辑商品请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateProductInfoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 编辑成功
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "404":
+          description: 商品不存在
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: 编辑商品信息
       tags:
       - 商品
   /merchant/images/upload-urls:

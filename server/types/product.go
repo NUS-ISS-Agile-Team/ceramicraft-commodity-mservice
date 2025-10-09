@@ -50,3 +50,17 @@ type GetProductListRequest struct {
 	Offset   int    `json:"offset"`
 	OrderBy  int    `json:"order_by"` // 0-updateTime desc, 1-updateTime inc
 }
+
+type UpdateProductInfoRequest struct {
+	ID               int    `json:"id"`
+	Name             string `json:"name"`
+	Category         string `json:"category"`
+	Price            int64  `json:"price"`
+	Desc             string `json:"desc"`
+	PicInfo          string `json:"pic_info"`
+	Dimensions       string `json:"dimensions"`
+	Material         string `json:"material"`
+	Weight           string `json:"weight"`
+	Capacity         string `json:"capacity"`
+	CareInstructions string `json:"care_instructions"`
+}
