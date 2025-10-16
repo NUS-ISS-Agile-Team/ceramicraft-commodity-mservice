@@ -56,7 +56,7 @@ type S3Config struct {
 	Region     string `mapstructure:"region"`
 }
 
-var UseLocalConfig = false
+var UseLocalConfig = true
 
 func Init() {
 	workDir, _ := os.Getwd()
