@@ -9,6 +9,7 @@ import (
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/grpc"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/http"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/log"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/metrics"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/mq"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/repository"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-user-mservice/common/utils"
@@ -23,6 +24,7 @@ var sigCh = make(chan os.Signal, 1)
 func main() {
 	config.Init()
 	log.InitLogger()
+	metrics.RegisterMetrics()
 	repository.Init()
 	utils.InitJwtSecret()
 	mq.Init()

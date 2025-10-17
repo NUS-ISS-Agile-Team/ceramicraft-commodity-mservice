@@ -2,9 +2,11 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	_ "github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/docs"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/http/api"
+	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/server/metrics"
 	"github.com/NUS-ISS-Agile-Team/ceramicraft-user-mservice/common/middleware"
 	swaggerFiles "github.com/swaggo/files"
 	gs "github.com/swaggo/gin-swagger"
@@ -19,6 +21,10 @@ func NewRouter() *gin.Engine {
 
 	baseRouter := r.Group(servicePrefix)
 	{
+
+		baseRouter.Use(metrics.MetricsMiddleware())
+		baseRouter.GET("/metrics", gin.WrapH(promhttp.Handler()))
+
 		// swagger router
 		baseRouter.GET("/swagger/*any", gs.WrapHandler(swaggerFiles.Handler))
 
