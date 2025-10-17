@@ -304,8 +304,8 @@ func (c *CartServiceImpl) EstimatePrice(ctx context.Context, userId int) (*data.
 }
 
 const (
-	freeShipPrice = 300
-	shipPrice     = 8
+	freeShipPrice = 30000 // $300.00 in cents
+	shipPrice     = 800    // $8.00 in cents
 )
 
 func getTaxPrice(productPrice int) int {
