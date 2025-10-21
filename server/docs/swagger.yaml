@@ -156,16 +156,12 @@ definitions:
     type: object
   types.UpdateProductStatusRequest:
     properties:
-      id:
-        type: integer
       status:
         description: 0-新的状态是下架，1-新的状态是上架
         type: integer
     type: object
   types.UpdateProductStockRequest:
     properties:
-      id:
-        type: integer
       stock:
         type: integer
     type: object
@@ -478,66 +474,6 @@ paths:
       summary: Get presigned URL for image upload
       tags:
       - Image
-  /merchant/product-status:
-    patch:
-      consumes:
-      - application/json
-      description: 将商品状态更改为上架状态
-      parameters:
-      - description: 商品上架请求
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/types.UpdateProductStatusRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 上架成功
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "400":
-          description: 请求参数错误
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "404":
-          description: 商品不存在
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "500":
-          description: 服务器内部错误
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-      summary: 上架商品
-      tags:
-      - 商品
-  /merchant/product-stock:
-    patch:
-      consumes:
-      - application/json
-      description: 只有当商品处于下架状态时，才能更改商品库存
-      parameters:
-      - description: 更新商品库存请求
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/types.UpdateProductStockRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 更新成功
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "400":
-          description: 请求参数错误
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-      summary: 商家端更新商品库存
-      tags:
-      - 商品
   /merchant/product/{id}:
     get:
       consumes:
@@ -641,6 +577,67 @@ paths:
       summary: 添加商品
       tags:
       - 商品
+  /merchant/products/:id/status:
+    patch:
+      consumes:
+      - application/json
+      description: 将商品状态更改为上架状态
+      parameters:
+      - description: 商品上架请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateProductStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 上架成功
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "404":
+          description: 商品不存在
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: 上架商品
+      tags:
+      - 商品
+  /merchant/products/:id/stock:
+    patch:
+      consumes:
+      - application/json
+      description: 只有当商品处于下架状态时，才能更改商品库存
+      parameters:
+      - description: 更新商品库存请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateProductStockRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 更新成功
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: 商家端更新商品库存
+      tags:
+      - 商品
+  /merchant/products/{id}:
     put:
       consumes:
       - application/json

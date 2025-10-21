@@ -88,8 +88,16 @@ func GetProductMerchant(c *gin.Context) {
 // @Failure 400 {object} data.BaseResponse "请求参数错误"
 // @Failure 404 {object} data.BaseResponse "商品不存在"
 // @Failure 500 {object} data.BaseResponse "服务器内部错误"
-// @Router /merchant/product-status [patch]
+// @Router /merchant/products/:id/status [patch]
 func UpdateProductStatus(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Logger.Errorf("GetProduct: Invalid product ID: %v", err)
+		c.JSON(http.StatusBadRequest, data.ResponseFailed("Invalid product ID"))
+		return
+	}
+
 	var req types.UpdateProductStatusRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Logger.Errorf("PublishProduct: Invalid request body: %v", err)
@@ -98,7 +106,7 @@ func UpdateProductStatus(c *gin.Context) {
 	}
 
 	if req.Status == 1 {
-		err := service.GetProductServiceInstance().PublishProduct(c.Request.Context(), req.ID)
+		err := service.GetProductServiceInstance().PublishProduct(c.Request.Context(), id)
 		if err != nil {
 			log.Logger.Errorf("UpdateProductStatus: Failed to publish product: %v", err)
 			c.JSON(http.StatusOK, data.ResponseFailed(err.Error()))
@@ -106,7 +114,7 @@ func UpdateProductStatus(c *gin.Context) {
 		}
 		c.JSON(http.StatusOK, data.ResponseSuccess("publish product success"))
 	} else {
-		err := service.GetProductServiceInstance().UnpublishProduct(c.Request.Context(), req.ID)
+		err := service.GetProductServiceInstance().UnpublishProduct(c.Request.Context(), id)
 		if err != nil {
 			log.Logger.Errorf("UpdateProductStatus: Failed to unpublish product: %v", err)
 			c.JSON(http.StatusOK, data.ResponseFailed(err.Error()))
@@ -125,8 +133,16 @@ func UpdateProductStatus(c *gin.Context) {
 // @Param request body types.UpdateProductStockRequest true "更新商品库存请求"
 // @Success 200 {object} data.BaseResponse "更新成功"
 // @Failure 400 {object} data.BaseResponse "请求参数错误"
-// @Router /merchant/product-stock [patch]
+// @Router /merchant/products/:id/stock [patch]
 func UpdateProductStock(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Logger.Errorf("GetProduct: Invalid product ID: %v", err)
+		c.JSON(http.StatusBadRequest, data.ResponseFailed("Invalid product ID"))
+		return
+	}
+
 	var req types.UpdateProductStockRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Logger.Errorf("UpdateProductStock: Invalid request body: %v", err)
@@ -134,7 +150,7 @@ func UpdateProductStock(c *gin.Context) {
 		return
 	}
 
-	err := service.GetProductServiceInstance().UpdateProductStock(c.Request.Context(), req.ID, req.Stock)
+	err = service.GetProductServiceInstance().UpdateProductStock(c.Request.Context(), id, req.Stock)
 	if err != nil {
 		log.Logger.Errorf("UpdateProductStock: Failed to update product stock: %v", err)
 		c.JSON(http.StatusOK, data.ResponseFailed(err.Error()))
@@ -291,8 +307,16 @@ func GetMerchantProductList(c *gin.Context) {
 // @Failure 400 {object} data.BaseResponse "请求参数错误"
 // @Failure 404 {object} data.BaseResponse "商品不存在"
 // @Failure 500 {object} data.BaseResponse "服务器内部错误"
-// @Router /merchant/products [put]
+// @Router /merchant/products/{id} [put]
 func EditProductInfo(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Logger.Errorf("GetProduct: Invalid product ID: %v", err)
+		c.JSON(http.StatusBadRequest, data.ResponseFailed("Invalid product ID"))
+		return
+	}
+
 	var req types.UpdateProductInfoRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Logger.Errorf("EditProductInfo: Invalid request body: %v", err)
@@ -300,8 +324,10 @@ func EditProductInfo(c *gin.Context) {
 		return
 	}
 
+	req.ID = id
+
 	// 调用 service 层更新商品信息
-	err := service.GetProductServiceInstance().UpdateProductInfo(c.Request.Context(), &req)
+	err = service.GetProductServiceInstance().UpdateProductInfo(c.Request.Context(), &req)
 	if err != nil {
 		log.Logger.Errorf("EditProductInfo: Failed to update product info: %v", err)
 		c.JSON(http.StatusInternalServerError, data.ResponseFailed("Failed to update product info"))

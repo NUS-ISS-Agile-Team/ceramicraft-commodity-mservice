@@ -27,12 +27,10 @@ type ProductSimplifiedInfo struct {
 }
 
 type UpdateProductStatusRequest struct {
-	ID     int `json:"id"`
 	Status int `json:"status"` // 0-新的状态是下架，1-新的状态是上架
 }
 
 type UpdateProductStockRequest struct {
-	ID    int `json:"id"`
 	Stock int `json:"stock"`
 }
 

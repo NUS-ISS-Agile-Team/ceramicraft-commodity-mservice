@@ -507,98 +507,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/merchant/product-status": {
-            "patch": {
-                "description": "将商品状态更改为上架状态",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "商品"
-                ],
-                "summary": "上架商品",
-                "parameters": [
-                    {
-                        "description": "商品上架请求",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.UpdateProductStatusRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "上架成功",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "请求参数错误",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "商品不存在",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "服务器内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/merchant/product-stock": {
-            "patch": {
-                "description": "只有当商品处于下架状态时，才能更改商品库存",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "商品"
-                ],
-                "summary": "商家端更新商品库存",
-                "parameters": [
-                    {
-                        "description": "更新商品库存请求",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.UpdateProductStockRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "更新成功",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "请求参数错误",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/merchant/product/{id}": {
             "get": {
                 "description": "根据商品ID获取商品详细信息",
@@ -721,6 +629,138 @@ const docTemplate = `{
                     }
                 }
             },
+            "post": {
+                "description": "新增一个商品",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商品"
+                ],
+                "summary": "添加商品",
+                "parameters": [
+                    {
+                        "description": "商品信息",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.ProductInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/merchant/products/:id/status": {
+            "patch": {
+                "description": "将商品状态更改为上架状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商品"
+                ],
+                "summary": "上架商品",
+                "parameters": [
+                    {
+                        "description": "商品上架请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateProductStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "上架成功",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "商品不存在",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/merchant/products/:id/stock": {
+            "patch": {
+                "description": "只有当商品处于下架状态时，才能更改商品库存",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商品"
+                ],
+                "summary": "商家端更新商品库存",
+                "parameters": [
+                    {
+                        "description": "更新商品库存请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateProductStockRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "更新成功",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/merchant/products/{id}": {
             "put": {
                 "description": "根据商品ID更新商品详细信息",
                 "consumes": [
@@ -765,44 +805,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "服务器内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "新增一个商品",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "商品"
-                ],
-                "summary": "添加商品",
-                "parameters": [
-                    {
-                        "description": "商品信息",
-                        "name": "product",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.ProductInfo"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/data.BaseResponse"
                         }
@@ -1047,9 +1049,6 @@ const docTemplate = `{
         "types.UpdateProductStatusRequest": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer"
-                },
                 "status": {
                     "description": "0-新的状态是下架，1-新的状态是上架",
                     "type": "integer"
@@ -1059,9 +1058,6 @@ const docTemplate = `{
         "types.UpdateProductStockRequest": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer"
-                },
                 "stock": {
                     "type": "integer"
                 }
