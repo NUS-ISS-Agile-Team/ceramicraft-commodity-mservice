@@ -158,6 +158,9 @@ definitions:
     properties:
       id:
         type: integer
+      status:
+        description: 0-新的状态是下架，1-新的状态是上架
+        type: integer
     type: object
   types.UpdateProductStockRequest:
     properties:
@@ -371,7 +374,45 @@ paths:
       summary: Get number of selected items in cart
       tags:
       - Cart
-  /customer/list:
+  /customer/product/{id}:
+    get:
+      consumes:
+      - application/json
+      description: 根据商品ID获取商品详细信息
+      parameters:
+      - description: 商品ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/types.ProductInfo'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "404":
+          description: 商品不存在
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: 获取商品详情(用户侧)
+      tags:
+      - 商品
+  /customer/products:
     get:
       consumes:
       - application/json
@@ -411,104 +452,6 @@ paths:
       summary: 用户端获取商品列表
       tags:
       - 商品
-  /customer/product/{id}:
-    get:
-      consumes:
-      - application/json
-      description: 根据商品ID获取商品详细信息
-      parameters:
-      - description: 商品ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 成功
-          schema:
-            allOf:
-            - $ref: '#/definitions/data.BaseResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/types.ProductInfo'
-              type: object
-        "400":
-          description: 请求参数错误
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "404":
-          description: 商品不存在
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "500":
-          description: 服务器内部错误
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-      summary: 获取商品详情(用户侧)
-      tags:
-      - 商品
-  /merchant/add:
-    post:
-      consumes:
-      - application/json
-      description: 新增一个商品
-      parameters:
-      - description: 商品信息
-        in: body
-        name: product
-        required: true
-        schema:
-          $ref: '#/definitions/types.ProductInfo'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-      summary: 添加商品
-      tags:
-      - 商品
-  /merchant/edit:
-    post:
-      consumes:
-      - application/json
-      description: 根据商品ID更新商品详细信息
-      parameters:
-      - description: 编辑商品请求
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/types.UpdateProductInfoRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 编辑成功
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "400":
-          description: 请求参数错误
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "404":
-          description: 商品不存在
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "500":
-          description: 服务器内部错误
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-      summary: 编辑商品信息
-      tags:
-      - 商品
   /merchant/images/upload-urls:
     post:
       consumes:
@@ -535,44 +478,64 @@ paths:
       summary: Get presigned URL for image upload
       tags:
       - Image
-  /merchant/list:
-    get:
+  /merchant/product-status:
+    patch:
       consumes:
       - application/json
-      description: 支持按关键词搜索、分类筛选、分页，并按更新时间排序
+      description: 将商品状态更改为上架状态
       parameters:
-      - description: 搜索关键词
-        in: query
-        name: keyword
-        type: string
-      - description: 商品分类
-        in: query
-        name: category
-        type: string
-      - description: 偏移量，默认0
-        in: query
-        name: offset
-        type: integer
-      - description: 排序方式：0-按更新时间降序，1-按更新时间升序，默认0
-        in: query
-        name: order_by
-        type: integer
+      - description: 商品上架请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateProductStatusRequest'
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: 上架成功
           schema:
             $ref: '#/definitions/data.BaseResponse'
         "400":
-          description: Bad Request
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "404":
+          description: 商品不存在
           schema:
             $ref: '#/definitions/data.BaseResponse'
         "500":
-          description: Internal Server Error
+          description: 服务器内部错误
           schema:
             $ref: '#/definitions/data.BaseResponse'
-      summary: 商家端获取商品列表
+      summary: 上架商品
+      tags:
+      - 商品
+  /merchant/product-stock:
+    patch:
+      consumes:
+      - application/json
+      description: 只有当商品处于下架状态时，才能更改商品库存
+      parameters:
+      - description: 更新商品库存请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateProductStockRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 更新成功
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: 商家端更新商品库存
       tags:
       - 商品
   /merchant/product/{id}:
@@ -613,23 +576,87 @@ paths:
       summary: 获取商品详情
       tags:
       - 商品
-  /merchant/publish:
-    post:
+  /merchant/products:
+    get:
       consumes:
       - application/json
-      description: 将商品状态更改为上架状态
+      description: 支持按关键词搜索、分类筛选、分页，并按更新时间排序
       parameters:
-      - description: 商品上架请求
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/types.UpdateProductStatusRequest'
+      - description: 搜索关键词
+        in: query
+        name: keyword
+        type: string
+      - description: 商品分类
+        in: query
+        name: category
+        type: string
+      - description: 偏移量，默认0
+        in: query
+        name: offset
+        type: integer
+      - description: 排序方式：0-按更新时间降序，1-按更新时间升序，默认0
+        in: query
+        name: order_by
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: 上架成功
+          description: OK
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: 商家端获取商品列表
+      tags:
+      - 商品
+    post:
+      consumes:
+      - application/json
+      description: 新增一个商品
+      parameters:
+      - description: 商品信息
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/types.ProductInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: 添加商品
+      tags:
+      - 商品
+    put:
+      consumes:
+      - application/json
+      description: 根据商品ID更新商品详细信息
+      parameters:
+      - description: 编辑商品请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateProductInfoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 编辑成功
           schema:
             $ref: '#/definitions/data.BaseResponse'
         "400":
@@ -644,67 +671,7 @@ paths:
           description: 服务器内部错误
           schema:
             $ref: '#/definitions/data.BaseResponse'
-      summary: 上架商品
-      tags:
-      - 商品
-  /merchant/unpublish:
-    post:
-      consumes:
-      - application/json
-      description: 将商品状态更改为下架状态
-      parameters:
-      - description: 商品下架请求
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/types.UpdateProductStatusRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 下架成功
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "400":
-          description: 请求参数错误
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "404":
-          description: 商品不存在
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "500":
-          description: 服务器内部错误
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-      summary: 下架商品
-      tags:
-      - 商品
-  /merchant/updateStock:
-    post:
-      consumes:
-      - application/json
-      description: 只有当商品处于下架状态时，才能更改商品库存
-      parameters:
-      - description: 更新商品库存请求
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/types.UpdateProductStockRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 更新成功
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "400":
-          description: 请求参数错误
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-      summary: 商家端更新商品库存
+      summary: 编辑商品信息
       tags:
       - 商品
 swagger: "2.0"

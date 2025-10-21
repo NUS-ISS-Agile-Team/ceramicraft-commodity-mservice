@@ -37,19 +37,18 @@ func NewRouter() *gin.Engine {
 		merchantRouter := baseRouter.Group("/merchant")
 		{
 			merchantRouter.Use(middleware.AuthMiddleware())
-			merchantRouter.POST("/add", api.AddProduct)
+			merchantRouter.POST("/products", api.AddProduct)
 			merchantRouter.GET("/product/:id", api.GetProductMerchant)
-			merchantRouter.POST("/publish", api.PublishProduct)
-			merchantRouter.POST("/unpublish", api.UnpublishProduct)
-			merchantRouter.POST("/updateStock", api.UpdateProductStock)
+			merchantRouter.PATCH("/product-status", api.UpdateProductStatus)
+			merchantRouter.PATCH("/product-stock", api.UpdateProductStock)
 			merchantRouter.POST("/images/upload-urls", api.GetImageUploadPresignURL)
-			merchantRouter.GET("/list", api.GetMerchantProductList)
-			merchantRouter.POST("/edit", api.EditProductInfo)
+			merchantRouter.GET("/products", api.GetMerchantProductList)
+			merchantRouter.PUT("/products", api.EditProductInfo)
 		}
 
 		customerRouter := baseRouter.Group("/customer")
 		{
-			customerRouter.GET("/list", api.GetCustomerProductList)
+			customerRouter.GET("/products", api.GetCustomerProductList)
 			customerRouter.GET("/product/:id", api.GetProductCustomer)
 
 			authed := customerRouter.Group("")

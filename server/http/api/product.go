@@ -20,7 +20,7 @@ import (
 // @Param product body types.ProductInfo true "商品信息"
 // @Success 200 {object} data.BaseResponse
 // @Failure 400 {object} data.BaseResponse
-// @Router /merchant/add [post]
+// @Router /merchant/products [post]
 func AddProduct(c *gin.Context) {
 	var req types.ProductInfo
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -88,8 +88,8 @@ func GetProductMerchant(c *gin.Context) {
 // @Failure 400 {object} data.BaseResponse "请求参数错误"
 // @Failure 404 {object} data.BaseResponse "商品不存在"
 // @Failure 500 {object} data.BaseResponse "服务器内部错误"
-// @Router /merchant/publish [post]
-func PublishProduct(c *gin.Context) {
+// @Router /merchant/product-status [patch]
+func UpdateProductStatus(c *gin.Context) {
 	var req types.UpdateProductStatusRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Logger.Errorf("PublishProduct: Invalid request body: %v", err)
@@ -97,44 +97,23 @@ func PublishProduct(c *gin.Context) {
 		return
 	}
 
-	err := service.GetProductServiceInstance().PublishProduct(c.Request.Context(), req.ID)
-	if err != nil {
-		log.Logger.Errorf("PublishProduct: Failed to publish product: %v", err)
-		c.JSON(http.StatusOK, data.ResponseFailed(err.Error()))
-		return
+	if req.Status == 1 {
+		err := service.GetProductServiceInstance().PublishProduct(c.Request.Context(), req.ID)
+		if err != nil {
+			log.Logger.Errorf("UpdateProductStatus: Failed to publish product: %v", err)
+			c.JSON(http.StatusOK, data.ResponseFailed(err.Error()))
+			return
+		}
+		c.JSON(http.StatusOK, data.ResponseSuccess("publish product success"))
+	} else {
+		err := service.GetProductServiceInstance().UnpublishProduct(c.Request.Context(), req.ID)
+		if err != nil {
+			log.Logger.Errorf("UpdateProductStatus: Failed to unpublish product: %v", err)
+			c.JSON(http.StatusOK, data.ResponseFailed(err.Error()))
+			return
+		}
+		c.JSON(http.StatusOK, data.ResponseSuccess("unpublish product success"))
 	}
-
-	c.JSON(http.StatusOK, data.ResponseSuccess(nil))
-}
-
-// UnpublishProduct godoc
-// @Summary 下架商品
-// @Description 将商品状态更改为下架状态
-// @Tags 商品
-// @Accept json
-// @Produce json
-// @Param request body types.UpdateProductStatusRequest true "商品下架请求"
-// @Success 200 {object} data.BaseResponse "下架成功"
-// @Failure 400 {object} data.BaseResponse "请求参数错误"
-// @Failure 404 {object} data.BaseResponse "商品不存在"
-// @Failure 500 {object} data.BaseResponse "服务器内部错误"
-// @Router /merchant/unpublish [post]
-func UnpublishProduct(c *gin.Context) {
-	var req types.UpdateProductStatusRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		log.Logger.Errorf("UnpublishProduct: Invalid request body: %v", err)
-		c.JSON(http.StatusBadRequest, data.ResponseFailed(err.Error()))
-		return
-	}
-
-	err := service.GetProductServiceInstance().UnpublishProduct(c.Request.Context(), req.ID)
-	if err != nil {
-		log.Logger.Errorf("UnpublishProduct: Failed to unpublish product: %v", err)
-		c.JSON(http.StatusOK, data.ResponseFailed(err.Error()))
-		return
-	}
-
-	c.JSON(http.StatusOK, data.ResponseSuccess(nil))
 }
 
 // UpdateProductStock godoc
@@ -146,7 +125,7 @@ func UnpublishProduct(c *gin.Context) {
 // @Param request body types.UpdateProductStockRequest true "更新商品库存请求"
 // @Success 200 {object} data.BaseResponse "更新成功"
 // @Failure 400 {object} data.BaseResponse "请求参数错误"
-// @Router /merchant/updateStock [post]
+// @Router /merchant/product-stock [patch]
 func UpdateProductStock(c *gin.Context) {
 	var req types.UpdateProductStockRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -178,7 +157,7 @@ func UpdateProductStock(c *gin.Context) {
 // @Success 200 {object} data.BaseResponse
 // @Failure 400 {object} data.BaseResponse
 // @Failure 500 {object} data.BaseResponse
-// @Router /customer/list [get]
+// @Router /customer/products [get]
 func GetCustomerProductList(c *gin.Context) {
 	var req types.GetProductListRequest
 
@@ -246,7 +225,7 @@ func GetCustomerProductList(c *gin.Context) {
 // @Success 200 {object} data.BaseResponse
 // @Failure 400 {object} data.BaseResponse
 // @Failure 500 {object} data.BaseResponse
-// @Router /merchant/list [get]
+// @Router /merchant/products [get]
 func GetMerchantProductList(c *gin.Context) {
 	var req types.GetProductListRequest
 
@@ -312,7 +291,7 @@ func GetMerchantProductList(c *gin.Context) {
 // @Failure 400 {object} data.BaseResponse "请求参数错误"
 // @Failure 404 {object} data.BaseResponse "商品不存在"
 // @Failure 500 {object} data.BaseResponse "服务器内部错误"
-// @Router /merchant/edit [post]
+// @Router /merchant/products [put]
 func EditProductInfo(c *gin.Context) {
 	var req types.UpdateProductInfoRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
