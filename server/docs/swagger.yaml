@@ -156,13 +156,12 @@ definitions:
     type: object
   types.UpdateProductStatusRequest:
     properties:
-      id:
+      status:
+        description: 0-新的状态是下架，1-新的状态是上架
         type: integer
     type: object
   types.UpdateProductStockRequest:
     properties:
-      id:
-        type: integer
       stock:
         type: integer
     type: object
@@ -371,7 +370,45 @@ paths:
       summary: Get number of selected items in cart
       tags:
       - Cart
-  /customer/list:
+  /customer/product/{id}:
+    get:
+      consumes:
+      - application/json
+      description: 根据商品ID获取商品详细信息
+      parameters:
+      - description: 商品ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/data.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/types.ProductInfo'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "404":
+          description: 商品不存在
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: 获取商品详情(用户侧)
+      tags:
+      - 商品
+  /customer/products:
     get:
       consumes:
       - application/json
@@ -411,7 +448,33 @@ paths:
       summary: 用户端获取商品列表
       tags:
       - 商品
-  /customer/product/{id}:
+  /merchant/images/upload-urls:
+    post:
+      consumes:
+      - application/json
+      description: Get presigned URL for image upload
+      parameters:
+      - description: image_type=(jpg|jpeg|png)
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/data.ImgUploadRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/data.ImgUploadResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: Get presigned URL for image upload
+      tags:
+      - Image
+  /merchant/product/{id}:
     get:
       consumes:
       - application/json
@@ -446,96 +509,10 @@ paths:
           description: 服务器内部错误
           schema:
             $ref: '#/definitions/data.BaseResponse'
-      summary: 获取商品详情(用户侧)
+      summary: 获取商品详情
       tags:
       - 商品
-  /merchant/add:
-    post:
-      consumes:
-      - application/json
-      description: 新增一个商品
-      parameters:
-      - description: 商品信息
-        in: body
-        name: product
-        required: true
-        schema:
-          $ref: '#/definitions/types.ProductInfo'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-      summary: 添加商品
-      tags:
-      - 商品
-  /merchant/edit:
-    post:
-      consumes:
-      - application/json
-      description: 根据商品ID更新商品详细信息
-      parameters:
-      - description: 编辑商品请求
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/types.UpdateProductInfoRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 编辑成功
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "400":
-          description: 请求参数错误
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "404":
-          description: 商品不存在
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "500":
-          description: 服务器内部错误
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-      summary: 编辑商品信息
-      tags:
-      - 商品
-  /merchant/images/upload-urls:
-    post:
-      consumes:
-      - application/json
-      description: Get presigned URL for image upload
-      parameters:
-      - description: image_type=(jpg|jpeg|png)
-        in: body
-        name: product
-        required: true
-        schema:
-          $ref: '#/definitions/data.ImgUploadRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/data.ImgUploadResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-      summary: Get presigned URL for image upload
-      tags:
-      - Image
-  /merchant/list:
+  /merchant/products:
     get:
       consumes:
       - application/json
@@ -575,46 +552,33 @@ paths:
       summary: 商家端获取商品列表
       tags:
       - 商品
-  /merchant/product/{id}:
-    get:
+    post:
       consumes:
       - application/json
-      description: 根据商品ID获取商品详细信息
+      description: 新增一个商品
       parameters:
-      - description: 商品ID
-        in: path
-        name: id
+      - description: 商品信息
+        in: body
+        name: product
         required: true
-        type: integer
+        schema:
+          $ref: '#/definitions/types.ProductInfo'
       produces:
       - application/json
       responses:
         "200":
-          description: 成功
+          description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/data.BaseResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/types.ProductInfo'
-              type: object
+            $ref: '#/definitions/data.BaseResponse'
         "400":
-          description: 请求参数错误
+          description: Bad Request
           schema:
             $ref: '#/definitions/data.BaseResponse'
-        "404":
-          description: 商品不存在
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "500":
-          description: 服务器内部错误
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-      summary: 获取商品详情
+      summary: 添加商品
       tags:
       - 商品
-  /merchant/publish:
-    post:
+  /merchant/products/:id/status:
+    patch:
       consumes:
       - application/json
       description: 将商品状态更改为上架状态
@@ -647,42 +611,8 @@ paths:
       summary: 上架商品
       tags:
       - 商品
-  /merchant/unpublish:
-    post:
-      consumes:
-      - application/json
-      description: 将商品状态更改为下架状态
-      parameters:
-      - description: 商品下架请求
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/types.UpdateProductStatusRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 下架成功
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "400":
-          description: 请求参数错误
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "404":
-          description: 商品不存在
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-        "500":
-          description: 服务器内部错误
-          schema:
-            $ref: '#/definitions/data.BaseResponse'
-      summary: 下架商品
-      tags:
-      - 商品
-  /merchant/updateStock:
-    post:
+  /merchant/products/:id/stock:
+    patch:
       consumes:
       - application/json
       description: 只有当商品处于下架状态时，才能更改商品库存
@@ -705,6 +635,40 @@ paths:
           schema:
             $ref: '#/definitions/data.BaseResponse'
       summary: 商家端更新商品库存
+      tags:
+      - 商品
+  /merchant/products/{id}:
+    put:
+      consumes:
+      - application/json
+      description: 根据商品ID更新商品详细信息
+      parameters:
+      - description: 编辑商品请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateProductInfoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 编辑成功
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "404":
+          description: 商品不存在
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/data.BaseResponse'
+      summary: 编辑商品信息
       tags:
       - 商品
 swagger: "2.0"

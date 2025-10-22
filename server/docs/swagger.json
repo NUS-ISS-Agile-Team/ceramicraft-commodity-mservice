@@ -337,67 +337,6 @@
                 }
             }
         },
-        "/customer/list": {
-            "get": {
-                "description": "支持按关键词搜索、分类筛选、分页，并按更新时间排序",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "商品"
-                ],
-                "summary": "用户端获取商品列表",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "搜索关键词",
-                        "name": "keyword",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "商品分类",
-                        "name": "category",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "偏移量，默认0",
-                        "name": "offset",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "排序方式：0-按更新时间降序，1-按更新时间升序，默认0",
-                        "name": "order_by",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/customer/product/{id}": {
             "get": {
                 "description": "根据商品ID获取商品详细信息",
@@ -460,139 +399,7 @@
                 }
             }
         },
-        "/merchant/add": {
-            "post": {
-                "description": "新增一个商品",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "商品"
-                ],
-                "summary": "添加商品",
-                "parameters": [
-                    {
-                        "description": "商品信息",
-                        "name": "product",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.ProductInfo"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/merchant/edit": {
-            "post": {
-                "description": "根据商品ID更新商品详细信息",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "商品"
-                ],
-                "summary": "编辑商品信息",
-                "parameters": [
-                    {
-                        "description": "编辑商品请求",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.UpdateProductInfoRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "编辑成功",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "请求参数错误",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "商品不存在",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "服务器内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/merchant/images/upload-urls": {
-            "post": {
-                "description": "Get presigned URL for image upload",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Image"
-                ],
-                "summary": "Get presigned URL for image upload",
-                "parameters": [
-                    {
-                        "description": "image_type=(jpg|jpeg|png)",
-                        "name": "product",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/data.ImgUploadRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/data.ImgUploadResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/merchant/list": {
+        "/customer/products": {
             "get": {
                 "description": "支持按关键词搜索、分类筛选、分页，并按更新时间排序",
                 "consumes": [
@@ -604,7 +411,7 @@
                 "tags": [
                     "商品"
                 ],
-                "summary": "商家端获取商品列表",
+                "summary": "用户端获取商品列表",
                 "parameters": [
                     {
                         "type": "string",
@@ -646,6 +453,46 @@
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/merchant/images/upload-urls": {
+            "post": {
+                "description": "Get presigned URL for image upload",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Get presigned URL for image upload",
+                "parameters": [
+                    {
+                        "description": "image_type=(jpg|jpeg|png)",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/data.ImgUploadRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/data.ImgUploadResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/data.BaseResponse"
                         }
@@ -715,8 +562,107 @@
                 }
             }
         },
-        "/merchant/publish": {
+        "/merchant/products": {
+            "get": {
+                "description": "支持按关键词搜索、分类筛选、分页，并按更新时间排序",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商品"
+                ],
+                "summary": "商家端获取商品列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "搜索关键词",
+                        "name": "keyword",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "商品分类",
+                        "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "偏移量，默认0",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "排序方式：0-按更新时间降序，1-按更新时间升序，默认0",
+                        "name": "order_by",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    }
+                }
+            },
             "post": {
+                "description": "新增一个商品",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商品"
+                ],
+                "summary": "添加商品",
+                "parameters": [
+                    {
+                        "description": "商品信息",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.ProductInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/merchant/products/:id/status": {
+            "patch": {
                 "description": "将商品状态更改为上架状态",
                 "consumes": [
                     "application/json"
@@ -767,60 +713,8 @@
                 }
             }
         },
-        "/merchant/unpublish": {
-            "post": {
-                "description": "将商品状态更改为下架状态",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "商品"
-                ],
-                "summary": "下架商品",
-                "parameters": [
-                    {
-                        "description": "商品下架请求",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.UpdateProductStatusRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "下架成功",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "请求参数错误",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "商品不存在",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "服务器内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/data.BaseResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/merchant/updateStock": {
-            "post": {
+        "/merchant/products/:id/stock": {
+            "patch": {
                 "description": "只有当商品处于下架状态时，才能更改商品库存",
                 "consumes": [
                     "application/json"
@@ -852,6 +746,58 @@
                     },
                     "400": {
                         "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/merchant/products/{id}": {
+            "put": {
+                "description": "根据商品ID更新商品详细信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商品"
+                ],
+                "summary": "编辑商品信息",
+                "parameters": [
+                    {
+                        "description": "编辑商品请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateProductInfoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "编辑成功",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "商品不存在",
+                        "schema": {
+                            "$ref": "#/definitions/data.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
                         "schema": {
                             "$ref": "#/definitions/data.BaseResponse"
                         }
@@ -1096,7 +1042,8 @@
         "types.UpdateProductStatusRequest": {
             "type": "object",
             "properties": {
-                "id": {
+                "status": {
+                    "description": "0-新的状态是下架，1-新的状态是上架",
                     "type": "integer"
                 }
             }
@@ -1104,9 +1051,6 @@
         "types.UpdateProductStockRequest": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer"
-                },
                 "stock": {
                     "type": "integer"
                 }
